@@ -11,14 +11,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 //Connecting to our MongoDB Database before utilization throughout code.
-const user = process.env.MONGODB_USER;
-const pass = process.env.MONGODB_PASS;
+const PASS = process.env.MONGODB_PASS;
 const uri =
-  "mongodb+srv://" +
-  user +
-  ":" +
-  pass +
-  "@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://Admin:" + PASS + "@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(uri);
 
 const app = express();
