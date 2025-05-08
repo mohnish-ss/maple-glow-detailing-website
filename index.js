@@ -14,7 +14,13 @@ dotenv.config();
 const PASS = process.env.MONGODB_PASS;
 const uri =
   "mongodb+srv://Admin:" + PASS + "@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
 const app = express();
 
