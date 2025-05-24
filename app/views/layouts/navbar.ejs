@@ -1,0 +1,58 @@
+<head>
+  <link rel="icon" type="image/x-icon" href="/images/webicon.png" />
+</head>
+<!-- This style is used to ensure that the CSS loads before the HTML, preventing FOUC (Flash of Unstyled Content). -->
+<!-- Since all pages use the navbar, this style is situated in the header to facilitate the process of applying the style to all pages. -->
+<style>
+  html {
+    visibility: hidden;
+    opacity: 0;
+  }
+</style>
+<div class="fade-in-container-a">
+  <ul class="navbar">
+    <div class="hamburger-menu">
+      <div class="hamburger-line"></div>
+      <div class="hamburger-line"></div>
+      <div class="hamburger-line"></div>
+    </div>
+
+    <div class="nav-links">
+      <div class="leftAlign">
+        <li><a class="navbar-element" href="/home">Home</a></li>
+        <li><a class="navbar-element" href="/booking">Book</a></li>
+        <li><a class="navbar-element" href="/estimate">Estimate</a></li>
+        <li><a class="navbar-element" href="/contact">Contact</a></li>
+      </div>
+
+      <div class="centerAlign">
+        <img src="images/mapleglowlogo.png" />
+      </div>
+
+      <!-- If the user is logged-in, shows the "Log-out" and "Profile" buttons instead of the "Sign-up" and "Log-in" buttons -->
+      <% if (isLoggedIn) { %>
+        <div class="rightAlign">
+          <li><a class="navbar-element" href="/logout">Log out</a></li>
+          <li><a class="important-navbar-element" href="/profile">Profile</a></li>
+        </div>
+        <% } else { %>
+          <div class="rightAlign">
+            <li><a class="navbar-element" href="/sign-up">Sign up</a></li>
+            <li><a class="important-navbar-element" href="/login">Log in</a></li>
+          </div>
+          <% } %>
+    </div>
+  </ul>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const hamburger = document.querySelector('.hamburger-menu');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', function () {
+      navLinks.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    });
+  });
+</script>
