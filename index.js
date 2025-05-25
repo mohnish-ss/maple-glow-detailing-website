@@ -11,21 +11,12 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
-import winston from "winston";
 import crypto from "crypto";
 import Tokens from "csrf";
 dotenv.config();
 
 // Initialize Express app first
 const app = express();
-
-// Debug logging for environment variables
-console.log('Environment variables loaded:', {
-  hasSessionSecret: !!process.env.SESSION_SECRET,
-  sessionSecretLength: process.env.SESSION_SECRET ? process.env.SESSION_SECRET.length : 0,
-  hasMongoPassword: !!process.env.MONGODB_PASS,
-  hasEmailPassword: !!process.env.EMAIL_PASSWORD
-});
 
 // Initialize CSRF protection
 const tokens = new Tokens();
@@ -53,14 +44,6 @@ app.use(
 
 // Add session debugging middleware
 app.use((req, res, next) => {
-  console.log('Session Debug:', {
-    sessionID: req.sessionID,
-    hasSession: !!req.session,
-    sessionData: req.session,
-    cookies: req.cookies,
-    env: process.env.NODE_ENV,
-    hasSessionSecret: !!process.env.SESSION_SECRET
-  });
   next();
 });
 
@@ -81,25 +64,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Configure Winston logger
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
-});
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-}
-
 // Account lockout settings
 const ACCOUNT_LOCKOUT = {
   maxAttempts: 5,
@@ -111,7 +75,6 @@ const failedLoginAttempts = new Map();
 
 // MongoDB Configuration - Fixed URI construction
 const PASS = process.env.MONGODB_PASS;
-console.log('MongoDB Password available:', !!PASS);
 const uri = `mongodb+srv://Admin:${PASS}@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // MongoDB Connection Pool - Fixed initialization
@@ -120,7 +83,6 @@ let db;
 
 async function initializeMongoDB() {
   try {
-    console.log('Initializing MongoDB connection...');
     mongoClient = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
@@ -135,13 +97,7 @@ async function initializeMongoDB() {
 
     await mongoClient.connect();
     db = mongoClient.db("user-details");
-    logger.info("MongoDB connection pool initialized successfully");
-
-    // Test the connection
-    await db.admin().ping();
-    console.log("Successfully connected to MongoDB!");
   } catch (error) {
-    logger.error("Failed to initialize MongoDB connection pool:", error);
     process.exit(1);
   }
 }
@@ -154,11 +110,9 @@ process.on('SIGINT', async () => {
   try {
     if (mongoClient) {
       await mongoClient.close();
-      logger.info("MongoDB connection closed");
     }
     process.exit(0);
   } catch (error) {
-    logger.error("Error closing MongoDB connection:", error);
     process.exit(1);
   }
 });
@@ -295,25 +249,13 @@ function resetFailedAttempts(key) {
 // Function to check the user's login credentials - Fixed
 async function checkUserLogin(user, pass, req, res) {
   try {
-    console.log('=== checkUserLogin Debug ===');
-    console.log('Input validation:', {
-      hasUser: !!user,
-      hasPass: !!pass,
-      username: user,
-      passwordLength: pass ? pass.length : 0
-    });
-
     // Input validation
     if (!user || !pass) {
-      console.log('Missing credentials');
-      logger.warn('Login attempt with missing credentials');
       return { success: false, message: 'Username and password are required' };
     }
 
     // Check for account lockout
     if (isAccountLocked(user)) {
-      console.log('Account is locked');
-      logger.warn(`Account locked for user: ${user}`);
       return { success: false, message: 'Account is temporarily locked. Please try again later.' };
     }
 
@@ -323,46 +265,21 @@ async function checkUserLogin(user, pass, req, res) {
     const attempts = failedLoginAttempts.get(rateLimitKey) || { count: 0, timestamp: Date.now() };
 
     if (attempts.count >= 5 && Date.now() - attempts.timestamp < 15 * 60 * 1000) {
-      console.log('Rate limit exceeded');
-      logger.warn(`Rate limit exceeded for IP: ${clientIP}`);
       return { success: false, message: 'Too many login attempts. Please try again later.' };
     }
 
-    console.log('Looking up user in database');
-    const collection = db.collection('details');
-
     let query;
+    const details = db.collection("details");
     if (user.includes("@")) {
-      console.log('Looking up by email');
-      query = await collection.findOne({ email: user.toLowerCase() });
+      query = await details.findOne({ email: user.toLowerCase() });
     } else {
-      console.log('Looking up by username');
-      query = await collection.findOne({ username: user.toLowerCase() });
+      query = await details.findOne({ username: user.toLowerCase() });
     }
-
-    console.log('Database query result:', {
-      found: !!query,
-      userFound: query ? {
-        username: query.username,
-        email: query.email,
-        hasPassword: !!query.password,
-        passwordLength: query.password ? query.password.length : 0
-      } : null
-    });
 
     if (!query) {
       updateFailedAttempts(rateLimitKey);
-      console.log('User not found');
-      logger.warn(`Failed login attempt for non-existent user: ${user}`);
       return { success: false, message: 'Invalid credentials' };
     }
-
-    console.log('Comparing passwords');
-    console.log('Password details:', {
-      enteredPasswordLength: pass.length,
-      storedPasswordLength: query.password.length,
-      storedPasswordPrefix: query.password.substring(0, 10) + '...'
-    });
 
     // Check if the stored password is a bcrypt hash
     const isBcryptHash = query.password.startsWith('$2');
@@ -377,20 +294,15 @@ async function checkUserLogin(user, pass, req, res) {
       if (passwordMatch) {
         // Update the password to be a bcrypt hash
         const hashedPassword = await bcrypt.hash(pass, 10);
-        await collection.updateOne(
+        await details.updateOne(
           { _id: query._id },
           { $set: { password: hashedPassword } }
         );
-        console.log('Password updated to bcrypt hash');
       }
     }
 
-    console.log('Password match result:', passwordMatch);
-
     if (passwordMatch) {
       resetFailedAttempts(rateLimitKey);
-      console.log('Login successful');
-      logger.info(`Successful login for user: ${user}`);
       const userData = {
         firstName: query.firstName,
         lastName: query.lastName,
@@ -403,13 +315,9 @@ async function checkUserLogin(user, pass, req, res) {
       return { success: true, userData: userData };
     } else {
       updateFailedAttempts(rateLimitKey);
-      console.log('Password mismatch');
-      logger.warn(`Failed login attempt for user: ${user}`);
       return { success: false, message: 'Invalid credentials' };
     }
   } catch (error) {
-    console.error('Database error:', error);
-    logger.error('Login error:', error);
     return { success: false, message: 'An error occurred during login' };
   }
 }
@@ -441,7 +349,6 @@ app.get("/login", (req, res) => {
 app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    logger.warn('Login validation failed:', errors.array());
     return res.json({
       success: false,
       message: 'Please provide valid username and password'
@@ -450,15 +357,10 @@ app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
 
   try {
     const { username, password } = req.body;
-    console.log('Login attempt for:', username);
 
     const result = await checkUserLogin(username, password, req, res);
 
     if (!result.success) {
-      logger.warn('Login failed', {
-        username,
-        reason: result.message
-      });
       return res.json({
         success: false,
         message: result.message || 'Invalid username or password'
@@ -480,28 +382,18 @@ app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
     // Force session save
     req.session.save((err) => {
       if (err) {
-        console.error('Session save error:', err);
-        logger.error('Error saving session:', err);
         return res.json({
           success: false,
           message: 'Failed to save session'
         });
       }
 
-      console.log('Session saved successfully:', {
-        sessionID: req.sessionID,
-        sessionData: req.session
-      });
-
-      logger.info('Login successful', { username: result.userData.userName });
       res.json({
         success: true,
         redirect: '/profile'
       });
     });
   } catch (error) {
-    console.error('Login error:', error);
-    logger.error('Login error:', error);
     res.json({
       success: false,
       message: 'An error occurred during login'
@@ -564,16 +456,7 @@ app.get("/sign-up", (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-  logger.info("Profile route - Session data:", {
-    username: req.session.username,
-    hasUserData: !!req.session.userData,
-    sessionID: req.sessionID
-  });
-
   if (!req.session.username) {
-    logger.warn("No username in session, redirecting to login", {
-      sessionID: req.sessionID
-    });
     return res.redirect("/login");
   }
 
@@ -598,7 +481,6 @@ app.get("/logout", (req, res) => {
 app.post("/sign-up-form", validateSignup, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    logger.warn('Signup validation failed:', errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
@@ -613,7 +495,6 @@ app.post("/sign-up-form", validateSignup, async (req, res) => {
       formData.password = hashedPassword;
 
       await saveDetails(formData);
-      logger.info(`New user registered: ${username}`);
 
       req.session.username = formData.username;
       req.session.userData = {
@@ -629,11 +510,9 @@ app.post("/sign-up-form", validateSignup, async (req, res) => {
       res.redirect("/profile");
     } else {
       req.session.usernameTaken = true;
-      logger.warn(`Username taken: ${username}`);
       res.redirect("/sign-up");
     }
   } catch (error) {
-    logger.error('Signup error:', error);
     res.status(500).send("Error submitting details, try again.");
   }
 });
@@ -661,7 +540,6 @@ async function checkEmailExists(email) {
     const query = await details.findOne(eMail);
     return query !== null;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -687,7 +565,6 @@ app.post("/forgot-password-email", async (req, res) => {
       });
 
       if (!process.env.EMAIL_PASSWORD) {
-        logger.error("Email password not configured in environment variables");
         return res.status(500).send("Email service configuration error");
       }
 
@@ -700,17 +577,14 @@ app.post("/forgot-password-email", async (req, res) => {
 
       try {
         await transporter.sendMail(emailLayout);
-        logger.info("Password recovery email sent successfully", { to: customerEmail });
         res.send("Email sent successfully");
       } catch (error) {
-        logger.error("Error sending email:", { error: error.message, to: customerEmail });
         res.status(500).send("Failed to send email");
       }
     } else {
       res.send("Email not linked to an account");
     }
   } catch (error) {
-    console.error("Error checking email:", error);
     res.status(500).send("An error occurred");
   }
 });
@@ -740,7 +614,6 @@ async function findPassword(email) {
       return { success: false, message: "Email not found" };
     }
   } catch (error) {
-    console.error("Error finding password:", error);
     throw error;
   }
 }
@@ -768,7 +641,6 @@ app.post("/login-remotely", async (req, res) => {
       res.status(404).json({ success: false });
     }
   } catch (error) {
-    console.error("Error in remote login:", error);
     res.status(500).json({ success: false });
   }
 });
@@ -832,7 +704,6 @@ async function sendConfirmationEmail(email, name, day, month, time, detail, addr
     await transporter.sendMail(email1);
     await transporter.sendMail(email2);
   } catch (error) {
-    console.error("Error sending confirmation emails:", error);
     throw error;
   }
 }
@@ -850,7 +721,6 @@ app.post("/send-confirmation-email", async (req, res) => {
     await sendConfirmationEmail(email, name, day, month, time, detail, address);
     res.send("e-mails sent");
   } catch (error) {
-    console.error("Error:", error);
     res.status(500).send("Error sending emails");
   }
 });
@@ -874,9 +744,7 @@ async function sendEmail(customerEmail, subject, text) {
     };
 
     await transporter.sendMail(emailLayout);
-    logger.info("Contact email sent successfully", { from: customerEmail });
   } catch (error) {
-    console.error("Error sending email:", error);
     throw error;
   }
 }
@@ -888,10 +756,8 @@ app.post("/contact-form", async (req, res) => {
     const customerEmail = req.body.email;
 
     await sendEmail(customerEmail, subject, message);
-    console.log("Sent e-mail successfully");
     res.redirect("/contact");
   } catch (error) {
-    console.error("Error sending contact form:", error);
     res.status(500).send("Error sending message");
   }
 });
@@ -899,11 +765,8 @@ app.post("/contact-form", async (req, res) => {
 // Function to update user details in the database
 async function updateDetails(formData, user, req) {
   try {
-    console.log("Updating user details...");
     const details = db.collection("details");
     const query = { username: user };
-
-    console.log("Updated details sent to DB:", formData);
 
     const result = await details.updateOne(query, { $set: formData });
 
@@ -923,7 +786,6 @@ async function updateDetails(formData, user, req) {
       };
     }
   } catch (error) {
-    console.error("Error updating details:", error);
     throw error;
   }
 }
@@ -931,12 +793,9 @@ async function updateDetails(formData, user, req) {
 // Saving the user details to the database
 async function saveDetails(formData) {
   try {
-    console.log("Saving user details to database");
     const details = db.collection("details");
     await details.insertOne(formData);
-    console.log("User details submitted to Database");
   } catch (error) {
-    console.error("Error saving user details:", error);
     throw error;
   }
 }
@@ -944,12 +803,10 @@ async function saveDetails(formData) {
 // Checking for unique username
 async function checkValidUsername(user) {
   try {
-    console.log("Checking username...");
     const details = db.collection("details");
     let query = await details.findOne({ username: user });
     return query !== null;
   } catch (error) {
-    console.error("Error checking username:", error);
     throw error;
   }
 }
@@ -957,14 +814,11 @@ async function checkValidUsername(user) {
 // Reading admin schedule
 async function getAdminSchedule() {
   try {
-    console.log("Getting schedule");
-    await mongoClient.connect();
     const database = mongoClient.db("user-details");
     const adminScheduleCollection = database.collection("adminSchedule");
     const adminSchedule = await adminScheduleCollection.findOne({});
     return adminSchedule;
   } catch (error) {
-    console.error("Error getting admin schedule:", error);
     throw error;
   } finally {
     await mongoClient.close();
@@ -976,7 +830,6 @@ app.get("/admin-schedule", async (req, res) => {
     const adminSchedule = await getAdminSchedule();
     res.json(adminSchedule);
   } catch (error) {
-    console.error("Error getting admin schedule:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -1028,7 +881,6 @@ app.get("/update-admin", async (req, res) => {
       res.status(404).json({ message: "No documents matched the query" });
     }
   } catch (error) {
-    console.error("Error updating admin schedule:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -1084,7 +936,6 @@ app.post("/book", async (req, res) => {
       res.status(404).json({ message: "No documents matched the query" });
     }
   } catch (error) {
-    console.error("Error updating admin schedule:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -1162,14 +1013,11 @@ app.post("/change-password", validatePasswordChange, async (req, res) => {
       { $set: { password: hashedPassword } }
     );
 
-    logger.info('Password changed successfully', { username });
     res.json({
       success: true,
       message: 'Password changed successfully'
     });
   } catch (error) {
-    console.error('Password change error:', error);
-    logger.error('Password change error:', error);
     res.json({
       success: false,
       message: 'An error occurred while changing password'
@@ -1180,7 +1028,5 @@ app.post("/change-password", validatePasswordChange, async (req, res) => {
 // Start server with error handling
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  logger.info(`Server started on port ${PORT}`);
 }).on('error', (err) => {
-  logger.error('Server error:', err);
 });
