@@ -17,6 +17,7 @@ dotenv.config();
 
 // Initialize Express app first
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy for correct client IP handling
 
 // Initialize CSRF protection
 const tokens = new Tokens();
@@ -31,12 +32,12 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false, // better for login flows
     rolling: true,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'lax'
     }
   })
@@ -178,14 +179,6 @@ const loginLimiter = RateLimit({
   max: 5, // 5 attempts
   message: 'Too many login attempts, please try again later.'
 });
-
-const apiLimiter = RateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.'
-});
-
-app.use(apiLimiter);
 
 // Enhanced input validation middleware
 const validateLogin = [
