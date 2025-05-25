@@ -254,8 +254,11 @@ async function checkUserLogin(user, pass, req, res) {
       return { success: false, message: 'Username and password are required' };
     }
 
+    // Sanitize user input
+    const sanitizedUser = String(user).trim().toLowerCase();
+
     // Check for account lockout
-    if (isAccountLocked(user)) {
+    if (isAccountLocked(sanitizedUser)) {
       return { success: false, message: 'Account is temporarily locked. Please try again later.' };
     }
 
@@ -270,10 +273,10 @@ async function checkUserLogin(user, pass, req, res) {
 
     let query;
     const details = db.collection("details");
-    if (user.includes("@")) {
-      query = await details.findOne({ email: user.toLowerCase() });
+    if (sanitizedUser.includes("@")) {
+      query = await details.findOne({ email: sanitizedUser });
     } else {
-      query = await details.findOne({ username: user.toLowerCase() });
+      query = await details.findOne({ username: sanitizedUser });
     }
 
     if (!query) {
@@ -536,7 +539,8 @@ var verificationCode = "";
 async function checkEmailExists(email) {
   try {
     const details = db.collection("details");
-    const eMail = { email: email };
+    const sanitizedEmail = String(email).trim().toLowerCase();
+    const eMail = { email: sanitizedEmail };
     const query = await details.findOne(eMail);
     return query !== null;
   } catch (error) {
@@ -605,7 +609,8 @@ app.post("/verify-code", (req, res) => {
 async function findPassword(email) {
   try {
     const details = db.collection("details");
-    const eMail = { email: email };
+    const sanitizedEmail = String(email).trim().toLowerCase();
+    const eMail = { email: sanitizedEmail };
     const query = await details.findOne(eMail);
 
     if (query) {
@@ -766,7 +771,8 @@ app.post("/contact-form", async (req, res) => {
 async function updateDetails(formData, user, req) {
   try {
     const details = db.collection("details");
-    const query = { username: user };
+    const sanitizedUser = String(user).trim().toLowerCase();
+    const query = { username: sanitizedUser };
 
     const result = await details.updateOne(query, { $set: formData });
 
@@ -804,7 +810,8 @@ async function saveDetails(formData) {
 async function checkValidUsername(user) {
   try {
     const details = db.collection("details");
-    let query = await details.findOne({ username: user });
+    const sanitizedUser = String(user).trim().toLowerCase();
+    let query = await details.findOne({ username: sanitizedUser });
     return query !== null;
   } catch (error) {
     throw error;
@@ -984,9 +991,12 @@ app.post("/change-password", validatePasswordChange, async (req, res) => {
       });
     }
 
+    // Sanitize username
+    const sanitizedUser = String(username).trim().toLowerCase();
+
     // Get user from database
     const details = db.collection("details");
-    const user = await details.findOne({ username: username });
+    const user = await details.findOne({ username: sanitizedUser });
 
     if (!user) {
       return res.json({
@@ -1009,7 +1019,7 @@ app.post("/change-password", validatePasswordChange, async (req, res) => {
 
     // Update password in database
     await details.updateOne(
-      { username: username },
+      { username: sanitizedUser },
       { $set: { password: hashedPassword } }
     );
 
