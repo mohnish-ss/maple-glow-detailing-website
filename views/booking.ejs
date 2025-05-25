@@ -9,7 +9,7 @@
 
     <div class="fade-in-container">
 
-        <h1 class="title">Book a detail with us.</h1> 
+        <h1 class="title">Book a detail with us.</h1>
 
         <div class="booking-grid">
 
@@ -266,9 +266,9 @@
     }
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    
+
     // Initialization of current and next month information.
-    let month; 
+    let month;
     let daysInMonth;
     let firstDay;
     let nextMonth;
@@ -518,7 +518,7 @@
 
     async function book() { // Checks if all required inputs are valid for booking.
 
-        if ("<%= username %>" && selectedDay >= 0 && viewingMonth >= 0 && selectedTimeSlot >= 0 && detailType >= 0) { 
+        if ("<%= username %>" && selectedDay >= 0 && viewingMonth >= 0 && selectedTimeSlot >= 0 && detailType >= 0) {
             let time = document.getElementById("time" + (selectedTimeSlot + 1)).textContent;
             let detail = document.getElementById("d" + (detailType + 1)).textContent;
             const response = await bookDatabase(selectedDay, viewingMonth, selectedTimeSlot, detailType);
@@ -541,12 +541,14 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<%= csrfToken %>'
                 },
                 body: JSON.stringify({
                     selectedDay,
                     viewingMonth,
                     selectedTimeSlot,
                     detailType,
+                    _csrf: '<%= csrfToken %>'
                 }),
             });
 

@@ -3,23 +3,31 @@
 <head>
   <%- include('layouts/navbar'); -%>
     <title>Contact Us</title>
+    <script src="/js/contact.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-
   <div class="fade-in-container">
-
     <h1 class="title">Contact Us</h1>
 
-    <div class="grid-container">
-
-      <div class="story-grid">
-
+    <div class="contact-container">
+      <div class="story-section">
         <div class="story-grid-title">
           <h2>Our Story</h2>
         </div>
 
-        <div>
+        <div class="story-content">
+          <div class="founder-images">
+            <div class="founder">
+              <img src="/images/owen.png" alt="Owen" class="founder-portrait">
+              <p class="founder-name">Owen</p>
+            </div>
+            <div class="founder">
+              <img src="/images/wiam.png" alt="Liam" class="founder-portrait">
+              <p class="founder-name">Liam</p>
+            </div>
+          </div>
           <p>Owen and Liam, two university students, stumbled upon an idea during a gym session: a car cleaning service.
             Undeterred, we refined our technique.
           </p>
@@ -39,65 +47,27 @@
             marked by trial and error, became a testament to their resilience and unwavering spirit.
           </p>
         </div>
-
       </div>
 
-      <div class="form-grid">
-
+      <div class="form-section">
         <div class="form-grid-title">
           <h2>Have any questions? Submit this form</h2>
         </div>
 
-        <div>
-          <!-- Creates contact form with all fields -->
-          <form class="contact-form" id="contact-form" action="/contact-form" method="post"
-            onsubmit="return checkValidEmail()">
+        <div class="form-wrapper">
+          <form class="contact-form" id="contact-form" action="/contact-form" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input class="input-box form-input-box" name="subject" id="subject" placeholder="Subject" required>
             <br><br>
             <input class="input-box form-input-box" name="email" id="email" placeholder="E-mail" required>
             <br><br>
-            <textarea name="message" id="text" class="form-input input-box" placeholder="Message" required></textarea>
+            <textarea name="message" id="text" class="input-box form-input" placeholder="Message" required></textarea>
             <br><br>
-            <button class="contact-form-submit-button" type="submit" onclick="popup()">Submit</button>
+            <button class="contact-form-submit-button" type="submit">Submit</button>
           </form>
         </div>
-
       </div>
-
-      <div class="image-grid">
-
-        <div class="image-grid-title">
-          <h2>Meet the crew</h2>
-        </div>
-
-        <!-- Image grid for images of Liam and Owen -->
-        <div class="image-grid-content">
-          <div class="crew-member">
-            <img src="images/wiam.png" class="portrait">
-            <div class="crew-member-text">
-              <p>Meet <strong>Liam Zhan</strong>, a visionary entrepreneur turning challenges into opportunities. His
-                business journey with partner Owen Huang began as a simple idea during a gym session. Fueled by
-                determination and innovation. Liam transforms their car cleaning.</p>
-            </div>
-          </div>
-
-          <br>
-
-          <div class="crew-member">
-            <img src="images/owen.png" class="portrait">
-            <div class="crew-member-text">
-              <p>Introducing <strong>Owen Huang</strong>, a dynamic entrepreneur with a relentless pursuit of success.
-                Alongside partner Liam Zhan, Owen initiated a car detailing venture fueled by shared interests. His
-                strategic mindset and hands-on approach have been crucial.</p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
     </div>
-
   </div>
 
   <style>
@@ -119,47 +89,9 @@
     }
   </style>
 
-  <script>
-
-    //Takes content of fields in form.
-    const subject = document.getElementById("subject");
-    const email = document.getElementById("email");
-    const text = document.getElementById("text");
-
-    function popup() {
-
-      //Creates alert if email address is invalid.
-      if (!checkValidEmail()) {
-        alert("Invalid e-mail address provided.");
-      }
-
-      //Sends all contact fields in email.
-      else if (subject.value !== "" && email.value !== "" && text.value !== "") {
-        //Sends alert for proper contact form submission. 
-        alert("Form submitted successfully.");
-      }
-    }
-
-    //Checks for proper email ending for validity. 
-    function checkValidEmail() {
-      const email = document.getElementById('email').value;
-      if (
-        email.includes("@gmail.com") ||
-        email.includes("@yahoo.com") ||
-        email.includes("@outlook.com") ||
-        email.includes("@icloud.com")
-      ) {
-        return true;
-      }
-      return false;
-    }
-
-  </script>
-
   <footer>
     <%- include('layouts/footer'); -%>
   </footer>
-
 </body>
 
 </html>

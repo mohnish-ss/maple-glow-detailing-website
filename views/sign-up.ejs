@@ -3,143 +3,140 @@
 <html>
 
 <head>
-    <%- include('layouts/navbar'); -%>
-        <title>Sign Up</title>
+  <%- include('layouts/navbar'); -%>
+    <title>Sign Up</title>
 </head>
 
 <body>
-    <div class="fade-in-container">
-        <h1 class="sign-up-title">Sign-Up</h1>
-        <div class="sign-up-form">
-            <form id="signupForm" action="/sign-up-form" method="post" onsubmit="return fieldsCheck()">
+  <div class="fade-in-container">
+    <h1 class="sign-up-title">Sign-Up</h1>
+    <div class="sign-up-form">
+      <form id="signupForm" action="/sign-up-form" method="post" onsubmit="return fieldsCheck()">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="text" id="firstName" name="firstName" class="input-box" placeholder="First name" required />
+        <br /><br />
 
-                <input type="text" id="firstName" name="firstName" class="input-box" placeholder="First name" required>
-                <br><br>
+        <input type="text" id="lastName" name="lastName" class="input-box" placeholder="Last name" required />
+        <br /><br />
 
-                <input type="text" id="lastName" name="lastName" class="input-box" placeholder="Last name" required>
-                <br><br>
+        <input type="text" id="email" name="email" class="input-box" placeholder="E-mail" required />
+        <span id="emailAlert" class="alertText"></span><br /><br />
 
-                <input type="text" id="email" name="email" class="input-box" placeholder="E-mail" required>
-                <span id="emailAlert" class="alertText"></span><br><br>
+        <input type="text" id="phoneNumber" name="phoneNumber" class="input-box" placeholder="Phone number" required />
+        <br /><br />
 
-                <input type="text" id="phoneNumber" name="phoneNumber" class="input-box" placeholder="Phone number"
-                    required>
-                <br><br>
+        <input type="text" id="address" name="address" class="input-box" placeholder="Address" required />
+        <br /><br />
 
-                <input type="text" id="address" name="address" class="input-box" placeholder="Address" required>
-                <br><br>
+        <input type="text" id="postalCode" name="postalCode" class="input-box" placeholder="Postal Code" required />
+        <br /><br />
 
-                <input type="text" id="postalCode" name="postalCode" class="input-box" placeholder="Postal Code"
-                    required>
-                <br><br>
+        <input type="text" id="username" name="username" class="input-box" placeholder="Username" required />
+        <span id="usernameAlert" class="alertText"></span><br /><br />
 
-                <input type="text" id="username" name="username" class="input-box" placeholder="Username" required>
-                <span id="usernameAlert" class="alertText"></span><br><br>
+        <input type="password" id="password" name="password" class="input-box" placeholder="Password" required />
 
-                <input type="password" id="password" name="password" class="input-box" placeholder="Password" required>
+        <span id="passwordAlert" class="alertText"></span><br /><br />
 
-                <span id="passwordAlert" class="alertText"></span><br><br>
-
-                <!-- Calls the "fieldsCheck()" function to ensure that all information entered is valid before the form is submitted. -->
-                <div class="input-container">
-                    <input type="password" type="text" id="confirmPassword" name="confirmPassword" class="input-box"
-                        placeholder="Confirm password" required>
-                    <button type="submit" onclick="fieldsCheck()" class="submit-button"><img
-                            src="https://i.ibb.co/DDndqQN/Untitled-design-1.png"></button>
-
-                </div>
-                <span id="confirmPasswordAlert" class="alertText"></span>
-
-            </form>
+        <!-- Calls the "fieldsCheck()" function to ensure that all information entered is valid before the form is submitted. -->
+        <div class="input-container">
+          <input type="password" type="text" id="confirmPassword" name="confirmPassword" class="input-box"
+            placeholder="Confirm password" required />
+          <button type="submit" onclick="fieldsCheck()" class="submit-button">
+            <img src="https://i.ibb.co/DDndqQN/Untitled-design-1.png" />
+          </button>
         </div>
-
-        <br><br>
-
-        <div class="form-hyperlink">Already have an account? <a class="hyperlink" href="/login">Log in here ↗</a></div>
-
-        <br><br>
-
+        <span id="confirmPasswordAlert" class="alertText"></span>
+      </form>
     </div>
 
+    <br /><br />
+
+    <div class="form-hyperlink">
+      Already have an account?
+      <a class="hyperlink" href="/login">Log in here ↗</a>
+    </div>
+
+    <br /><br />
+  </div>
 </body>
 
 <script>
-    //Error trapping functions to ensure user inputs valid information.
-    function checkPass(pass) {
-        if (pass.length < 8) {
-            return false;
-        }
-
-        let upper = false;
-        let lower = false;
-        let digit = false;
-        let special = false;
-
-        for (let i = 0; i < pass.length; i++) {
-            if (pass.charAt(i) >= "A" && pass.charAt(i) <= "Z") {
-                upper = true;
-            } else if (pass.charAt(i) >= "a" && pass.charAt(i) <= "z") {
-                lower = true;
-            } else if (pass.charAt(i) >= "0" && pass.charAt(i) <= "9") {
-                digit = true;
-            } else if ("@$!%*?&_".includes(pass.charAt(i))) {
-                special = true;
-            }
-        }
-        return upper && lower && digit && special;
+  //Error trapping functions to ensure user inputs valid information.
+  function checkPass(pass) {
+    if (pass.length < 8) {
+      return false;
     }
 
-    function fieldsCheck() {
-        let passwordAlert = document.getElementById("passwordAlert");
-        let emailAlert = document.getElementById("emailAlert");
+    let upper = false;
+    let lower = false;
+    let digit = false;
+    let special = false;
 
-        passwordAlert.textContent = "";
-        emailAlert.textContent = "";
+    for (let i = 0; i < pass.length; i++) {
+      if (pass.charAt(i) >= "A" && pass.charAt(i) <= "Z") {
+        upper = true;
+      } else if (pass.charAt(i) >= "a" && pass.charAt(i) <= "z") {
+        lower = true;
+      } else if (pass.charAt(i) >= "0" && pass.charAt(i) <= "9") {
+        digit = true;
+      } else if ("@$!%*?&_".includes(pass.charAt(i))) {
+        special = true;
+      }
+    }
+    return upper && lower && digit && special;
+  }
 
-        let password = document.getElementById("password").value;
-        let confirmPassword = document.getElementById("confirmPassword").value;
+  function fieldsCheck() {
+    let passwordAlert = document.getElementById("passwordAlert");
+    let emailAlert = document.getElementById("emailAlert");
 
-        if (password !== confirmPassword) {
-            passwordAlert.style.opacity = 1;
-            passwordAlert.textContent = "Passwords do not match";
-            return false;
-        }
+    passwordAlert.textContent = "";
+    emailAlert.textContent = "";
 
-        if (!checkPass(password)) {
-            passwordAlert.style.opacity = 1;
-            passwordAlert.textContent = "Must have 8 characters, one uppercase, one lowercase, and one special character";
-            return false;
-        }
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
 
-        const email = document.getElementById('email').value;
-        if (
-            email.includes("@gmail.com") ||
-            email.includes("@yahoo.com") ||
-            email.includes("@outlook.com") ||
-            email.includes("@icloud.com")
-        ) {
-            return true;
-        }
-        emailAlert.style.opacity = 1;
-        emailAlert.textContent = "Invalid e-mail address";
-        return false;
+    if (password !== confirmPassword) {
+      passwordAlert.style.opacity = 1;
+      passwordAlert.textContent = "Passwords do not match";
+      return false;
     }
 
-    let usernameAlert = document.getElementById("usernameAlert");
-    let usernameTaken = "<%= usernameTaken %>";
+    if (!checkPass(password)) {
+      passwordAlert.style.opacity = 1;
+      passwordAlert.textContent =
+        "Must have 8 characters, one uppercase, one lowercase, and one special character";
+      return false;
+    }
 
-    if (usernameTaken) {
-        usernameAlert.style.opacity = 1;
-        usernameAlert.textContent = "Username taken";
+    const email = document.getElementById("email").value;
+    if (
+      email.includes("@gmail.com") ||
+      email.includes("@yahoo.com") ||
+      email.includes("@outlook.com") ||
+      email.includes("@icloud.com")
+    ) {
+      return true;
     }
-    if (performance.navigation.type === 1 && usernameTaken) {
-        usernameAlert.textContent = "";
-        usernameTaken = false;
-    }
+    emailAlert.style.opacity = 1;
+    emailAlert.textContent = "Invalid e-mail address";
+    return false;
+  }
+
+  let usernameAlert = document.getElementById("usernameAlert");
+  let usernameTaken = "<%= usernameTaken %>";
+
+  if (usernameTaken) {
+    usernameAlert.style.opacity = 1;
+    usernameAlert.textContent = "Username taken";
+  }
+  if (performance.navigation.type === 1 && usernameTaken) {
+    usernameAlert.textContent = "";
+    usernameTaken = false;
+  }
 </script>
 
-<footer>
-    <%- include('layouts/footer'); -%>
-</footer>
+<footer><%- include('layouts/footer'); -%></footer>
 
 </html>

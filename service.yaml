@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: maple-glow-service
+spec:
+  selector:
+    app: maple-glow
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: NodePort

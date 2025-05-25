@@ -39,14 +39,6 @@
             <label class="profile-label" for="username">Username</label><br>
             <input class="input-box" type="text" id="username" name="username" disabled><br><br>
 
-            <label class="profile-label" for="password">Password</label><br>
-            <div class="password-block">
-                <input class="input-box" type="password" id="password" name="password" disabled>
-                <button class="password-vis-icon" onclick="togglePass()"><img
-                        src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
-                </button>
-            </div>
-            <br>
             <div class="button-block">
                 <button id="editButton" class="profile-page-buttons" onclick="edit()">Edit</button>
                 <!-- Hidden information form with "Save" button. -->
@@ -59,9 +51,32 @@
                     <input type="text" id="addressHidden" name="address" hidden><br>
                     <input type="text" id="postalCodeHidden" name="postalCode" hidden><br>
                     <input type="text" id="usernameHidden" name="username" hidden><br>
-                    <input type="text" id="passwordHidden" name="password" hidden><br>
-                    <input type="text" id="confirmPasswordHidden" name="confirmPassword" hidden><br>
                 </form>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="password-change-section">
+                <h2 class="personal-information-title">Change Password</h2>
+                <form id="passwordChangeForm" onsubmit="return changePassword(event)">
+                    <label class="profile-label" for="currentPassword">Current Password</label><br>
+                    <div class="password-block">
+                        <input class="input-box" type="password" id="currentPassword" name="currentPassword" required>
+                        <button type="button" class="password-vis-icon" onclick="toggleCurrentPass()">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
+                        </button>
+                    </div><br>
+
+                    <label class="profile-label" for="newPassword">New Password</label><br>
+                    <div class="password-block">
+                        <input class="input-box" type="password" id="newPassword" name="newPassword" required>
+                        <button type="button" class="password-vis-icon" onclick="toggleNewPass()">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
+                        </button>
+                    </div><br>
+
+                    <button type="submit" class="profile-page-buttons">Change Password</button>
+                </form>
+                <div id="passwordChangeMessage" class="message"></div>
             </div>
 
         </div>
@@ -82,7 +97,6 @@
     let address = document.getElementById("address");
     let postalCode = document.getElementById("postalCode");
     let username = document.getElementById("username");
-    let password = document.getElementById("password");
 
     //Default background color for the input boxes.
     firstName.style.backgroundColor = '#e7e7e7';
@@ -92,7 +106,6 @@
     address.style.backgroundColor = '#e7e7e7';
     postalCode.style.backgroundColor = '#e7e7e7';
     username.style.backgroundColor = '#e7e7e7';
-    password.style.backgroundColor = '#e7e7e7';
 
     //Error trapping functions to ensure user updates their information while conforming to certain standards.
     function checkPass(pass) {
@@ -120,14 +133,6 @@
     }
 
     function checkFields() {
-        const password = password.value;
-
-        if (!checkPass(password)) {
-            alert("Invalid password: must have 8 characters, one uppercase, one lowercase, and one special character");
-            enableInputs();
-            return false;
-        }
-
         const email = email.value;
         if (
             email.includes("@gmail.com") ||
@@ -141,23 +146,6 @@
         alert("Invalid e-mail address");
         enableInputs();
         return false;
-
-    }
-
-    //Toggle the password's visibily, default visibly set to "hidden".
-    function togglePass() {
-        const pass = password;
-        const eyeIcon = document.querySelector(".password-vis-icon img");
-
-        if (pass.type === "password") {
-            pass.type = "text";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png";
-            eyeIcon.style.opacity = 1;
-        } else {
-            pass.type = "password";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2355/2355322.png";
-            eyeIcon.style.opacity = 0.7;
-        }
     }
 
     //"edit()" function controls whether or not the input boxes are disabled or not. This function is called when the "Edit" button is pressed.
@@ -188,7 +176,7 @@
         phoneNumber.removeAttribute("disabled");
         address.removeAttribute("disabled");
         postalCode.removeAttribute("disabled");
-        password.removeAttribute("disabled");
+        username.removeAttribute("disabled");
 
         firstName.style.backgroundColor = 'white';
         lastName.style.backgroundColor = 'white';
@@ -196,7 +184,7 @@
         phoneNumber.style.backgroundColor = 'white';
         address.style.backgroundColor = 'white';
         postalCode.style.backgroundColor = 'white';
-        password.style.backgroundColor = 'white';
+        username.style.backgroundColor = 'white';
     }
 
     function disableInputs() {
@@ -206,7 +194,7 @@
         phoneNumber.setAttribute("disabled", true);
         address.setAttribute("disabled", true);
         postalCode.setAttribute("disabled", true);
-        password.setAttribute("disabled", true);
+        username.setAttribute("disabled", true);
 
         firstName.style.backgroundColor = '#e7e7e7';
         lastName.style.backgroundColor = '#e7e7e7';
@@ -214,26 +202,22 @@
         phoneNumber.style.backgroundColor = '#e7e7e7';
         address.style.backgroundColor = '#e7e7e7';
         postalCode.style.backgroundColor = '#e7e7e7';
-        password.style.backgroundColor = '#e7e7e7';
+        username.style.backgroundColor = '#e7e7e7';
     }
 
     //Saves the edits to the database.
     function save() {
-
         updateDisplayedInfo();
 
         document.getElementById("usernameHidden").value = username.value;
-        document.getElementById("passwordHidden").value = password.value;
         document.getElementById("firstNameHidden").value = firstName.value;
         document.getElementById("lastNameHidden").value = lastName.value;
         document.getElementById("emailHidden").value = email.value;
         document.getElementById("phoneNumberHidden").value = phoneNumber.value;
         document.getElementById("addressHidden").value = address.value;
         document.getElementById("postalCodeHidden").value = postalCode.value;
-        document.getElementById("confirmPasswordHidden").value = password.value;
 
         document.forms.submit();
-
     }
 
     //Updates the edits on the profile page after they are submitted.
@@ -245,7 +229,6 @@
         const newAddress = address.value;
         const newPostalCode = postalCode.value;
         const newUsername = username.value;
-        const newPassword = password.value;
 
         firstName.value = newName;
         lastName.value = newLastName;
@@ -254,7 +237,6 @@
         address.value = newAddress;
         postalCode.value = newPostalCode;
         username.value = newUsername;
-        password.value = newPassword;
 
         disableInputs();
     }
@@ -267,18 +249,92 @@
     address.value = "<%= userData.adr %>";
     postalCode.value = "<%= userData.pCode %>";
     username.value = "<%= userData.userName %>";
-    password.value = "<%= userData.passWord %>";
 
     //Hidden form on the profile page so that edits can be saved to the database, and then updated on the visible form afterwards.
     document.getElementById("usernameHidden").value = username.value;
-    document.getElementById("passwordHidden").value = password.value;
     document.getElementById("firstNameHidden").value = firstName.value;
     document.getElementById("lastNameHidden").value = lastName.value;
     document.getElementById("emailHidden").value = email.value;
     document.getElementById("phoneNumberHidden").value = phoneNumber.value;
     document.getElementById("addressHidden").value = address.value;
     document.getElementById("postalCodeHidden").value = postalCode.value;
-    document.getElementById("confirmPasswordHidden").value = password.value;
+
+    // Add these new functions for password change
+    function toggleCurrentPass() {
+        const pass = document.getElementById("currentPassword");
+        const eyeIcon = pass.nextElementSibling.querySelector("img");
+
+        if (pass.type === "password") {
+            pass.type = "text";
+            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png";
+            eyeIcon.style.opacity = 1;
+        } else {
+            pass.type = "password";
+            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2355/2355322.png";
+            eyeIcon.style.opacity = 0.7;
+        }
+    }
+
+    function toggleNewPass() {
+        const pass = document.getElementById("newPassword");
+        const eyeIcon = pass.nextElementSibling.querySelector("img");
+
+        if (pass.type === "password") {
+            pass.type = "text";
+            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png";
+            eyeIcon.style.opacity = 1;
+        } else {
+            pass.type = "password";
+            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2355/2355322.png";
+            eyeIcon.style.opacity = 0.7;
+        }
+    }
+
+    async function changePassword(event) {
+        event.preventDefault();
+
+        const currentPassword = document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const messageDiv = document.getElementById("passwordChangeMessage");
+
+        if (!checkPass(newPassword)) {
+            messageDiv.textContent = "Invalid password: must have 8 characters, one uppercase, one lowercase, and one special character";
+            messageDiv.style.display = "block";
+            messageDiv.style.color = "red";
+            return false;
+        }
+
+        try {
+            const response = await fetch('/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword,
+                    _csrf: '<%= csrfToken %>'
+                })
+            });
+
+            const data = await response.json();
+
+            messageDiv.textContent = data.message;
+            messageDiv.style.display = "block";
+            messageDiv.style.color = data.success ? "green" : "red";
+
+            if (data.success) {
+                document.getElementById("passwordChangeForm").reset();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            messageDiv.textContent = "An error occurred while changing password";
+            messageDiv.style.display = "block";
+            messageDiv.style.color = "red";
+        }
+
+        return false;
+    }
 
 </script>
 
