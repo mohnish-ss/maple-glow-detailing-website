@@ -145,104 +145,6 @@
 </body>
 
 
-<style>
-    /* "@media" is used to ensure the elements on the page resize properly within the user's screen size. */
-    @media (min-width: 1700px) {
-        .booking-button-option {
-            height: 28vh;
-            border-radius: 25px;
-            padding: 20px;
-            cursor: pointer;
-            color: whitesmoke;
-            border: none;
-            background-color: #0071e3;
-            font-family: "Nunito", "Helvetica Neue";
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .calendar-container {
-            border: 2px solid rgba(0, 0, 0, 0);
-            border-radius: 14px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-            width: 28vw;
-            padding-top: 3vh;
-            margin: auto;
-            background-color: #fafafa;
-        }
-
-        .booking-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .calendar-big-container {
-            padding-top: 8vh;
-            padding-right: 14vw;
-        }
-
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            padding-top: 8vh;
-            padding-left: 11vw;
-            padding-bottom: 8vh;
-            gap: 2vw;
-            max-width: 38vw;
-            height: 30vh;
-            padding-left: 15vw;
-        }
-    }
-
-    @media (max-width: 1700px) {
-        .booking-button-option {
-            height: 100%;
-            border-radius: 25px;
-            padding: 20px;
-            cursor: pointer;
-            color: whitesmoke;
-            border: none;
-            background-color: #0071e3;
-            font-family: "Nunito", "Helvetica Neue";
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .calendar-container {
-            border: 2px solid rgba(0, 0, 0, 0);
-            border-radius: 14px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            padding-top: 3vh;
-            margin: auto;
-            background-color: #fafafa;
-        }
-
-        .booking-grid {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .calendar-big-container {
-            padding-top: 8vh;
-            padding-right: 0;
-        }
-
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            padding-top: 8vh;
-            padding-bottom: 0;
-            gap: 2vw;
-            max-width: 38vw;
-            height: 100%;
-            padding-left: 0;
-        }
-    }
-</style>
 
 <script>
     // Store booking information
@@ -455,9 +357,12 @@
         resetSelectedTime();
         if (pressed.innerHTML.trim() !== "") {
             for (let i = 0; i < 37; i++) {
-                document.getElementById(i.toString()).style.backgroundColor = "#FAFAFA";
+                let cell = document.getElementById(i.toString());
+                cell.style.backgroundColor = "transparent";
+                cell.style.color = "inherit";
             }
-            pressed.style.backgroundColor = "#0071e3";
+            pressed.style.backgroundColor = "var(--primary)";
+            pressed.style.color = "white";
             pressed.style.borderRadius = "12px";
         }
     }
@@ -465,27 +370,34 @@
     function resetSelected() { // Resets the calendar to the default.
         selectedDay = undefined;
         for (let i = 0; i < 37; i++) {
-            document.getElementById(i.toString()).style.backgroundColor = "transparent";
-            document.getElementById(i.toString()).style.visibility = "visible";
+            let cell = document.getElementById(i.toString());
+            cell.style.backgroundColor = "transparent";
+            cell.style.color = "inherit";
+            cell.style.visibility = "visible";
         }
     }
 
     function updateSelectedTime(id) { // Highlights the selected timeslot. 
         selectedTimeSlot = id - 1;
         let pressed = document.getElementById("time" + id);
-        pressed.style.backgroundColor = "#00b4d8";
+        pressed.style.backgroundColor = "var(--primary)";
+        pressed.style.color = "white";
         for (let i = 1; i < 4; i++) {
             if (i !== id) {
-                document.getElementById("time" + i).style.backgroundColor = "#e7e7e7";
+                let btn = document.getElementById("time" + i);
+                btn.style.backgroundColor = "var(--bg-secondary)";
+                btn.style.color = "var(--text-secondary)";
             }
         }
     }
 
     function resetSelectedTime() { // Resets the timeslots to default colour. 
         selectedTimeSlot = undefined;
-        document.getElementById("time1").style.backgroundColor = "#0071e3";
-        document.getElementById("time2").style.backgroundColor = "#0071e3";
-        document.getElementById("time3").style.backgroundColor = "#0071e3";
+        for (let i = 1; i < 4; i++) {
+            let btn = document.getElementById("time" + i);
+            btn.style.backgroundColor = "var(--primary-light)";
+            btn.style.color = "var(--primary)";
+        }
     }
 
     function updateSelectedDetail(id) { // Highlights the selected detail. 

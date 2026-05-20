@@ -11,33 +11,46 @@
 
     <div class="profile-container">
 
-        <div class="fade-after">
-            <h2 class="personal-information-title">Personal information</h2>
+        <div class="fade-after minimal-card" style="width: 100%; max-width: 600px; margin: 0 auto;">
+            <h2 class="personal-information-title" style="margin-top: 0;">Personal information</h2>
 
             <!-- Visible information form. -->
-            <label class="profile-label" for="firstName">First name</label>
-            <div class="first-input-box-row">
-                <input class="input-box" type="text" id="firstName" name="firstName" disabled>
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                <div>
+                    <label class="profile-label" for="firstName">First name</label>
+                    <input class="input-box" type="text" id="firstName" name="firstName" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+                
+                <div>
+                    <label class="profile-label" for="lastName">Last name</label>
+                    <input class="input-box" type="text" id="lastName" name="lastName" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label class="profile-label" for="email">Email</label>
+                    <input class="input-box" type="text" id="email" name="email" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label class="profile-label" for="phoneNumber">Phone number</label>
+                    <input class="input-box" type="text" id="phoneNumber" name="phoneNumber" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label class="profile-label" for="address">Address</label>
+                    <input class="input-box" type="text" id="address" name="address" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label class="profile-label" for="postalCode">Postal code</label>
+                    <input class="input-box" type="text" id="postalCode" name="postalCode" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label class="profile-label" for="username">Username</label>
+                    <input class="input-box" type="text" id="username" name="username" disabled style="width: 100%; box-sizing: border-box;">
+                </div>
             </div>
-            <br>
-
-            <label class="profile-label" for="lastName">Last name</label><br>
-            <input class="input-box" type="text" id="lastName" name="lastName" disabled><br><br>
-
-            <label class="profile-label" for="email">Email</label><br>
-            <input class="input-box" type="text" id="email" name="email" disabled><br><br>
-
-            <label class="profile-label" for="phoneNumber">Phone number</label><br>
-            <input class="input-box" type="text" id="phoneNumber" name="phoneNumber" disabled><br><br>
-
-            <label class="profile-label" for="address">Address</label><br>
-            <input class="input-box" type="text" id="address" name="address" disabled><br><br>
-
-            <label class="profile-label" for="postalCode">Postal code</label><br>
-            <input class="input-box" type="text" id="postalCode" name="postalCode" disabled><br><br>
-
-            <label class="profile-label" for="username">Username</label><br>
-            <input class="input-box" type="text" id="username" name="username" disabled><br><br>
 
             <div class="button-block">
                 <button id="editButton" class="profile-page-buttons" onclick="edit()">Edit</button>
@@ -55,26 +68,30 @@
             </div>
 
             <!-- Password Change Section -->
-            <div class="password-change-section">
+            <div class="password-change-section" style="margin-top: 2rem;">
                 <h2 class="personal-information-title">Change Password</h2>
-                <form id="passwordChangeForm" onsubmit="return changePassword(event)">
-                    <label class="profile-label" for="currentPassword">Current Password</label><br>
-                    <div class="password-block">
-                        <input class="input-box" type="password" id="currentPassword" name="currentPassword" required>
-                        <button type="button" class="password-vis-icon" onclick="toggleCurrentPass()">
-                            <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
-                        </button>
-                    </div><br>
+                <form id="passwordChangeForm" onsubmit="return changePassword(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label class="profile-label" for="currentPassword">Current Password</label>
+                        <div class="password-block" style="position: relative;">
+                            <input class="input-box" type="password" id="currentPassword" name="currentPassword" required style="width: 100%; box-sizing: border-box;">
+                            <button type="button" class="password-vis-icon" onclick="toggleCurrentPass()">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
+                            </button>
+                        </div>
+                    </div>
 
-                    <label class="profile-label" for="newPassword">New Password</label><br>
-                    <div class="password-block">
-                        <input class="input-box" type="password" id="newPassword" name="newPassword" required>
-                        <button type="button" class="password-vis-icon" onclick="toggleNewPass()">
-                            <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
-                        </button>
-                    </div><br>
+                    <div>
+                        <label class="profile-label" for="newPassword">New Password</label>
+                        <div class="password-block" style="position: relative;">
+                            <input class="input-box" type="password" id="newPassword" name="newPassword" required style="width: 100%; box-sizing: border-box;">
+                            <button type="button" class="password-vis-icon" onclick="toggleNewPass()">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
+                            </button>
+                        </div>
+                    </div>
 
-                    <button type="submit" class="profile-page-buttons">Change Password</button>
+                    <button type="submit" class="profile-page-buttons" style="margin-top: 1rem;">Change Password</button>
                 </form>
                 <div id="passwordChangeMessage" class="message"></div>
             </div>

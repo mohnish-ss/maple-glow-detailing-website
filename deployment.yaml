@@ -28,3 +28,13 @@ spec:
                 secretKeyRef:
                   name: maple-glow-secrets
                   key: MONGODB_PASS
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: maple-glow-secrets
+                  key: SESSION_SECRET
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: maple-glow-secrets
+                  key: EMAIL_PASSWORD

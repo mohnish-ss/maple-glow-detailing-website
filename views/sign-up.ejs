@@ -10,43 +10,97 @@
 <body>
   <div class="fade-in-container">
     <h1 class="sign-up-title">Sign-Up</h1>
-    <div class="sign-up-form">
+    <style>
+      .sign-up-form {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      #signupForm {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      .form-group {
+        position: relative;
+        width: 100%;
+        opacity: 1;
+        transform: translateY(0);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 100px;
+      }
+      .form-group.hidden-step {
+        opacity: 0;
+        transform: translateY(15px);
+        max-height: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .form-group .alertText {
+        position: static;
+        display: block;
+        padding-top: 5px;
+        font-size: 0.8rem;
+      }
+      .input-container {
+        width: 100%;
+      }
+    </style>
+    
+    <div class="sign-up-form minimal-card">
       <form id="signupForm" action="/sign-up-form" method="post" onsubmit="return fieldsCheck()">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-        <input type="text" id="firstName" name="firstName" class="input-box" placeholder="First name" required />
-        <br /><br />
-
-        <input type="text" id="lastName" name="lastName" class="input-box" placeholder="Last name" required />
-        <br /><br />
-
-        <input type="text" id="email" name="email" class="input-box" placeholder="E-mail" required />
-        <span id="emailAlert" class="alertText"></span><br /><br />
-
-        <input type="text" id="phoneNumber" name="phoneNumber" class="input-box" placeholder="Phone number" required />
-        <br /><br />
-
-        <input type="text" id="address" name="address" class="input-box" placeholder="Address" required />
-        <br /><br />
-
-        <input type="text" id="postalCode" name="postalCode" class="input-box" placeholder="Postal Code" required />
-        <br /><br />
-
-        <input type="text" id="username" name="username" class="input-box" placeholder="Username" required />
-        <span id="usernameAlert" class="alertText"></span><br /><br />
-
-        <input type="password" id="password" name="password" class="input-box" placeholder="Password" required />
-
-        <span id="passwordAlert" class="alertText"></span><br /><br />
-
-        <!-- Calls the "fieldsCheck()" function to ensure that all information entered is valid before the form is submitted. -->
-        <div class="input-container">
-          <input type="password" type="text" id="confirmPassword" name="confirmPassword" class="input-box"
-            placeholder="Confirm password" required />
-          <button type="submit" onclick="fieldsCheck()" class="submit-button">
-            <img src="https://i.ibb.co/DDndqQN/Untitled-design-1.png" />
-          </button>
+        
+        <div class="form-group" id="group-firstName">
+          <input type="text" id="firstName" name="firstName" class="input-box progressive-input" placeholder="First name" required />
         </div>
-        <span id="confirmPasswordAlert" class="alertText"></span>
+
+        <div class="form-group hidden-step" id="group-lastName">
+          <input type="text" id="lastName" name="lastName" class="input-box progressive-input" placeholder="Last name" required />
+        </div>
+
+        <div class="form-group hidden-step" id="group-email">
+          <input type="email" id="email" name="email" class="input-box progressive-input" placeholder="E-mail" required />
+          <span id="emailAlert" class="alertText"></span>
+        </div>
+
+        <div class="form-group hidden-step" id="group-phoneNumber">
+          <input type="tel" id="phoneNumber" name="phoneNumber" class="input-box progressive-input" placeholder="Phone number" required />
+        </div>
+
+        <div class="form-group hidden-step" id="group-address">
+          <input type="text" id="address" name="address" class="input-box progressive-input" placeholder="Address" required />
+        </div>
+
+        <div class="form-group hidden-step" id="group-postalCode">
+          <input type="text" id="postalCode" name="postalCode" class="input-box progressive-input" placeholder="Postal Code" required />
+        </div>
+
+        <div class="form-group hidden-step" id="group-username">
+          <input type="text" id="username" name="username" class="input-box progressive-input" placeholder="Username" required />
+          <span id="usernameAlert" class="alertText"></span>
+        </div>
+
+        <div class="form-group hidden-step" id="group-password">
+          <input type="password" id="password" name="password" class="input-box progressive-input" placeholder="Password" required />
+          <span id="passwordAlert" class="alertText"></span>
+        </div>
+
+        <div class="form-group hidden-step" id="group-confirmPassword">
+          <div class="input-container">
+            <input type="password" id="confirmPassword" name="confirmPassword" class="input-box" placeholder="Confirm password" required />
+            <button type="submit" class="submit-button" aria-label="Sign Up">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+          <span id="confirmPasswordAlert" class="alertText"></span>
+        </div>
       </form>
     </div>
 
@@ -127,14 +181,53 @@
   let usernameAlert = document.getElementById("usernameAlert");
   let usernameTaken = "<%= usernameTaken %>";
 
-  if (usernameTaken) {
+  // Only show "Username taken" when the value is explicitly "true"
+  // (EJS renders boolean false as the string "false" which is truthy)
+  if (usernameTaken === "true") {
     usernameAlert.style.opacity = 1;
     usernameAlert.textContent = "Username taken";
   }
-  if (performance.navigation.type === 1 && usernameTaken) {
-    usernameAlert.textContent = "";
-    usernameTaken = false;
-  }
+
+  // Clear the alert on back-forward navigation (bfcache)
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      usernameAlert.textContent = "";
+      usernameAlert.style.opacity = 0;
+    }
+  });
+
+  // Progressive reveal logic for form fields
+  document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.progressive-input');
+    
+    // Function to reveal the next field(s)
+    const revealNext = (input, index) => {
+      if (input.value.trim() !== '') {
+        // Reveal the next field in the array
+        if (index < inputs.length - 1) {
+          const nextGroup = inputs[index + 1].closest('.form-group');
+          if (nextGroup) nextGroup.classList.remove('hidden-step');
+        }
+        // Specifically reveal confirm password when password is typed
+        if (input.id === 'password') {
+           const confirmGroup = document.getElementById('group-confirmPassword');
+           if (confirmGroup) confirmGroup.classList.remove('hidden-step');
+        }
+      }
+    };
+
+    // 1. Initial check (handles browser autofill and bfcache)
+    setTimeout(() => {
+      inputs.forEach((input, index) => revealNext(input, index));
+    }, 100);
+
+    // 2. Event listener for active typing
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => revealNext(input, index));
+      // Also listen to change event for autofill edge cases
+      input.addEventListener('change', () => revealNext(input, index));
+    });
+  });
 </script>
 
 <footer><%- include('layouts/footer'); -%></footer>

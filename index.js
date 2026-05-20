@@ -513,20 +513,13 @@ app.post("/sign-up-form", validateSignup, async (req, res) => {
   }
 });
 
-// Generates a random five-digit number to use as a verification code
+// Generates a cryptographically secure 6-digit verification code
 function generateVerificationCode() {
-  const numbers = "0123456789";
-  let code = "";
-
-  for (let i = 0; i < 5; i++) {
-    const randomIndex = Math.floor(Math.random() * numbers.length);
-    code += numbers.charAt(randomIndex);
-  }
-
-  return code;
+  return crypto.randomInt(100000, 999999).toString();
 }
 
-var verificationCode = "";
+// Verification code expiry time (10 minutes)
+const VERIFICATION_CODE_EXPIRY_MS = 10 * 60 * 1000;
 
 // Checks if the user's e-mail exists within the database
 async function checkEmailExists(email) {
@@ -549,21 +542,25 @@ app.post("/forgot-password-email", async (req, res) => {
   try {
     const emailExists = await checkEmailExists(customerEmail);
 
+    // Always return the same message to prevent email enumeration
     if (emailExists) {
-      verificationCode = code;
+      // Store verification code in session (not a global variable)
+      req.session.verificationCode = code;
+      req.session.verificationCodeExpiry = Date.now() + VERIFICATION_CODE_EXPIRY_MS;
       req.session.customerEmail = customerEmail;
+      req.session.codeVerified = false;
 
-      const transporter = nodemailer.createTransporter({
+      if (!process.env.EMAIL_PASSWORD) {
+        return res.status(500).send("Email service configuration error");
+      }
+
+      const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
           user: "mapleglowdetailing@gmail.com",
           pass: process.env.EMAIL_PASSWORD,
         },
       });
-
-      if (!process.env.EMAIL_PASSWORD) {
-        return res.status(500).send("Email service configuration error");
-      }
 
       const emailLayout = {
         from: "mapleglowdetailing@gmail.com",
@@ -574,13 +571,13 @@ app.post("/forgot-password-email", async (req, res) => {
 
       try {
         await transporter.sendMail(emailLayout);
-        res.send("Email sent successfully");
       } catch (error) {
-        res.status(500).send("Failed to send email");
+        // Log but don't reveal to user
+        console.error("Failed to send verification email");
       }
-    } else {
-      res.send("Email not linked to an account");
     }
+    // Return the same message regardless of whether the email was found
+    res.send("If this email is registered, a verification code has been sent.");
   } catch (error) {
     res.status(500).send("An error occurred");
   }
@@ -589,9 +586,26 @@ app.post("/forgot-password-email", async (req, res) => {
 // Runs when the user submits the code they receive in their e-mail
 app.post("/verify-code", (req, res) => {
   const code = req.body.codeValue;
-  const storedCode = verificationCode;
+  const storedCode = req.session.verificationCode;
+  const expiry = req.session.verificationCodeExpiry;
+
+  // Check that a code exists, hasn't expired, and matches
+  if (!storedCode || !expiry) {
+    return res.send("Invalid verification code");
+  }
+
+  if (Date.now() > expiry) {
+    // Clear expired code
+    req.session.verificationCode = null;
+    req.session.verificationCodeExpiry = null;
+    return res.send("Verification code has expired. Please request a new one.");
+  }
 
   if (code === storedCode) {
+    req.session.codeVerified = true;
+    // Clear the code so it can't be reused
+    req.session.verificationCode = null;
+    req.session.verificationCodeExpiry = null;
     res.send("Code verified successfully");
   } else {
     res.send("Invalid verification code");
@@ -620,6 +634,12 @@ async function findPassword(email) {
 app.post("/login-remotely", async (req, res) => {
   const eMail = req.body.email;
 
+  // SECURITY: Verify that the code was actually verified in this session
+  // and the email matches the one that requested the code
+  if (!req.session.codeVerified || req.session.customerEmail !== eMail) {
+    return res.status(403).json({ success: false, message: 'Verification required' });
+  }
+
   try {
     const result = await findPassword(eMail);
 
@@ -634,6 +654,9 @@ app.post("/login-remotely", async (req, res) => {
         pCode: result.userData.postalCode,
         userName: result.userData.username,
       };
+      // Clear verification state
+      req.session.codeVerified = false;
+      req.session.customerEmail = null;
       res.status(200).json({ success: true });
     } else {
       res.status(404).json({ success: false });
@@ -707,13 +730,18 @@ async function sendConfirmationEmail(email, name, day, month, time, detail, addr
 }
 
 app.post("/send-confirmation-email", async (req, res) => {
+  // Require authentication
+  if (!req.session.username || !req.session.userData) {
+    return res.status(401).send("Authentication required");
+  }
+
   try {
     const email = req.session.userData.email;
     const name = req.session.userData.firstName;
-    const day = req.body.day;
-    const month = req.body.month;
-    const time = req.body.time;
-    const detail = req.body.detail;
+    const day = String(req.body.day).replace(/[^a-zA-Z0-9 ]/g, '');
+    const month = String(req.body.month).replace(/[^a-zA-Z0-9 ]/g, '');
+    const time = String(req.body.time).replace(/[^a-zA-Z0-9 :]/g, '');
+    const detail = String(req.body.detail).replace(/[^a-zA-Z0-9 ]/g, '');
     const address = req.session.userData.adr;
 
     await sendConfirmationEmail(email, name, day, month, time, detail, address);
@@ -749,9 +777,15 @@ async function sendEmail(customerEmail, subject, text) {
 
 app.post("/contact-form", async (req, res) => {
   try {
-    const subject = req.body.subject;
-    const message = req.body.message;
-    const customerEmail = req.body.email;
+    // Sanitize inputs to prevent header injection
+    const subject = String(req.body.subject).substring(0, 200).replace(/[\r\n]/g, '');
+    const message = String(req.body.message).substring(0, 5000);
+    const customerEmail = String(req.body.email).trim().toLowerCase();
+
+    // Basic email format check
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      return res.status(400).send("Invalid email address");
+    }
 
     await sendEmail(customerEmail, subject, message);
     res.redirect("/contact");
@@ -799,6 +833,35 @@ async function saveDetails(formData) {
   }
 }
 
+// POST /save-form — Save profile edits with field whitelisting
+app.post("/save-form", async (req, res) => {
+  // Require authentication
+  if (!req.session.username) {
+    return res.redirect("/login");
+  }
+
+  try {
+    // Whitelist only allowed fields to prevent arbitrary field injection
+    const allowedFields = ['firstName', 'lastName', 'email', 'phoneNumber', 'address', 'postalCode', 'username'];
+    const sanitizedData = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        sanitizedData[field] = String(req.body[field]).trim();
+      }
+    }
+
+    // Basic email validation
+    if (sanitizedData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedData.email)) {
+      return res.status(400).send("Invalid email address");
+    }
+
+    await updateDetails(sanitizedData, req.session.username, req);
+    res.redirect("/profile");
+  } catch (error) {
+    res.status(500).send("Error saving profile changes");
+  }
+});
+
 // Checking for unique username
 async function checkValidUsername(user) {
   try {
@@ -811,21 +874,23 @@ async function checkValidUsername(user) {
   }
 }
 
-// Reading admin schedule
+// Reading admin schedule — uses the shared connection pool (do NOT close mongoClient here)
 async function getAdminSchedule() {
   try {
-    const database = mongoClient.db("user-details");
-    const adminScheduleCollection = database.collection("adminSchedule");
+    const adminScheduleCollection = db.collection("adminSchedule");
     const adminSchedule = await adminScheduleCollection.findOne({});
     return adminSchedule;
   } catch (error) {
     throw error;
-  } finally {
-    await mongoClient.close();
   }
 }
 
 app.get("/admin-schedule", async (req, res) => {
+  // Require authentication to view schedule
+  if (!req.session.username) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
   try {
     const adminSchedule = await getAdminSchedule();
     res.json(adminSchedule);
@@ -836,11 +901,7 @@ app.get("/admin-schedule", async (req, res) => {
 
 async function updateDocument() {
   try {
-    await mongoClient.connect();
-    console.log("Connected to the database");
-
-    const database = mongoClient.db("user-details");
-    const adminScheduleCollection = database.collection("adminSchedule");
+    const adminScheduleCollection = db.collection("adminSchedule");
 
     // Reset the values of the database to defaults.
     const update = {
@@ -859,19 +920,19 @@ async function updateDocument() {
     };
 
     const result = await adminScheduleCollection.updateMany({}, update);
-
-    if (result.modifiedCount > 0) {
-      console.log("Documents updated successfully");
-    } else {
-      console.log("No documents matched the query");
-    }
-  } finally {
-    await mongoClient.close();
-    console.log("Connection closed");
+    return result;
+  } catch (error) {
+    throw error;
   }
 }
 
+// SECURITY: This resets the entire schedule — restrict to authenticated admin users
 app.get("/update-admin", async (req, res) => {
+  if (!req.session.username) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
+  // TODO: Add admin role check here (e.g., req.session.isAdmin)
   try {
     const result = await updateDocument();
 
@@ -886,19 +947,28 @@ app.get("/update-admin", async (req, res) => {
 });
 
 async function book(month, day, timeslot, detailtype, req) {
-  try {
-    await mongoClient.connect();
-    console.log("Connected to the database");
+  // SECURITY: Validate all parameters are safe non-negative integers to prevent NoSQL injection
+  const safeMonth = parseInt(month, 10);
+  const safeDay = parseInt(day, 10);
+  const safeTimeslot = parseInt(timeslot, 10);
+  const safeDetailtype = parseInt(detailtype, 10);
 
-    const database = mongoClient.db("user-details");
-    const adminScheduleCollection = database.collection("adminSchedule");
+  if ([safeMonth, safeDay, safeTimeslot, safeDetailtype].some(v => isNaN(v) || v < 0)) {
+    throw new Error('Invalid booking parameters');
+  }
+  if (safeMonth > 1 || safeDay > 30 || safeTimeslot > 2 || safeDetailtype > 3) {
+    throw new Error('Booking parameters out of range');
+  }
+
+  try {
+    const adminScheduleCollection = db.collection("adminSchedule");
 
     // Updating the values in the database.
     const update = {
       $set: {
-        [`Schedule.${month}.${day}.${timeslot}.1`]: false,
-        [`Schedule.${month}.${day}.${timeslot}.2`]: detailtype,
-        [`Schedule.${month}.${day}.${timeslot}.3`]: req.session.username,
+        [`Schedule.${safeMonth}.${safeDay}.${safeTimeslot}.1`]: false,
+        [`Schedule.${safeMonth}.${safeDay}.${safeTimeslot}.2`]: safeDetailtype,
+        [`Schedule.${safeMonth}.${safeDay}.${safeTimeslot}.3`]: req.session.username,
       },
     };
 
@@ -907,18 +977,18 @@ async function book(month, day, timeslot, detailtype, req) {
       update
     );
 
-    if (result.modifiedCount > 0) {
-      console.log("Document updated successfully");
-    } else {
-      console.log("No document matched the query");
-    }
-  } finally {
-    await mongoClient.close();
-    console.log("Connection closed");
+    return result;
+  } catch (error) {
+    throw error;
   }
 }
 
 app.post("/book", async (req, res) => {
+  // Require authentication
+  if (!req.session.username) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
   try {
     const { selectedDay, viewingMonth, selectedTimeSlot, detailType } =
       req.body;
@@ -936,6 +1006,9 @@ app.post("/book", async (req, res) => {
       res.status(404).json({ message: "No documents matched the query" });
     }
   } catch (error) {
+    if (error.message.includes('Invalid booking') || error.message.includes('out of range')) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
