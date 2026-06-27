@@ -200,7 +200,6 @@ app.use(helmet({
       scriptSrc: [
         "'self'",
         "'unsafe-inline'",
-        "'unsafe-eval'",
         "'unsafe-hashes'",
         "https://cdn.jsdelivr.net",
         "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs",
@@ -462,25 +461,16 @@ async function checkUserLogin(user, pass, req, res) {
       return { success: false, message: 'Invalid credentials' };
     }
 
-    // Check if the stored password is a bcrypt hash
+    // Only bcrypt password hashes are accepted.
     const storedPassword = typeof query.password === "string" ? query.password : "";
     const isBcryptHash = storedPassword.startsWith('$2');
 
     let passwordMatch;
     if (isBcryptHash) {
-      // If it's already a bcrypt hash, compare normally
       passwordMatch = await bcrypt.compare(pass, storedPassword);
     } else {
-      // If it's plain text, compare directly and update to hash
-      passwordMatch = pass === storedPassword;
-      if (passwordMatch) {
-        // Update the password to be a bcrypt hash
-        const hashedPassword = await bcrypt.hash(pass, 10);
-        await details.updateOne(
-          { _id: query._id },
-          { $set: { password: hashedPassword } }
-        );
-      }
+      updateFailedAttempts(rateLimitKey);
+      return { success: false, message: 'Password reset required' };
     }
 
     if (passwordMatch) {
@@ -1068,7 +1058,7 @@ async function getAdminSchedule() {
   }
 }
 
-app.get("/admin-schedule", requireAuth, async (req, res) => {
+app.get("/admin-schedule", requireAdmin, async (req, res) => {
   try {
     const adminSchedule = await getAdminSchedule();
     res.json(adminSchedule);
