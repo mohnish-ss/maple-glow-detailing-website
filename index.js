@@ -48,6 +48,23 @@ const ADMIN_USERNAMES = new Set(
 
 const csrfExemptPaths = new Set([]);
 
+const unsafeRequestLimiter = RateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests, please try again later." },
+  skip: (req) => ["GET", "HEAD", "OPTIONS"].includes(req.method)
+});
+
+const profileUpdateLimiter = RateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: "Too many profile updates, please try again later."
+});
+
 // Basic middleware
 app.use(bodyParser.json({ limit: "50kb" }));
 app.use(bodyParser.urlencoded({ extended: false, limit: "50kb" }));
@@ -111,6 +128,8 @@ app.use((req, res, next) => {
     });
   next();
 });
+
+app.use(unsafeRequestLimiter);
 
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method) || csrfExemptPaths.has(req.path)) {
@@ -993,7 +1012,7 @@ async function saveDetails(formData) {
 }
 
 // POST /save-form — Save profile edits with field whitelisting
-app.post("/save-form", validateProfileUpdate, async (req, res) => {
+app.post("/save-form", profileUpdateLimiter, validateProfileUpdate, async (req, res) => {
   // Require authentication
   if (!req.session.username) {
     return res.redirect("/login");
