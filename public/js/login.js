@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
             if (!username || !password) {
                 alert('Please fill in all fields');
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password, _csrf: csrfToken })
                 });
 
                 const data = await response.json();

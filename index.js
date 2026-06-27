@@ -4,6 +4,7 @@ import ejs from "ejs";
 import bodyParser from "body-parser";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import nodemailer from "nodemailer";
 import RateLimit from "express-rate-limit";
@@ -22,18 +23,53 @@ app.set('trust proxy', 1); // Trust first proxy for correct client IP handling
 // Initialize CSRF protection
 const tokens = new Tokens();
 
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const MONGODB_PASS = process.env.MONGODB_PASS;
+const MONGODB_URI = process.env.MONGODB_URI ||
+  (MONGODB_PASS
+    ? `mongodb+srv://Admin:${encodeURIComponent(MONGODB_PASS)}@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+    : null);
+
+if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+  throw new Error("SESSION_SECRET must be set to at least 32 characters.");
+}
+
+if (!MONGODB_URI) {
+  throw new Error("Set MONGODB_URI or MONGODB_PASS before starting the app.");
+}
+
+const COOKIE_NAME = "maple_glow.sid";
+const ADMIN_USERNAMES = new Set(
+  (process.env.ADMIN_USERNAMES || "")
+    .split(",")
+    .map((username) => username.trim().toLowerCase())
+    .filter(Boolean)
+);
+
+const csrfExemptPaths = new Set([]);
+
 // Basic middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: "50kb" }));
+app.use(bodyParser.urlencoded({ extended: false, limit: "50kb" }));
 app.use(cookieParser());
 
 // Session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
+    name: COOKIE_NAME,
+    secret: SESSION_SECRET,
+    resave: false,
     saveUninitialized: false, // better for login flows
     rolling: true,
+    store: MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      dbName: "user-details",
+      collectionName: "sessions",
+      ttl: 24 * 60 * 60,
+      crypto: {
+        secret: SESSION_SECRET
+      }
+    }),
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
@@ -62,6 +98,30 @@ app.use((req, res, next) => {
     const token = tokens.create(req.session.csrfSecret);
     res.locals.csrfToken = token;
   }
+  res.locals.json = (value) =>
+    JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (char) => {
+      const replacements = {
+        "<": "\\u003c",
+        ">": "\\u003e",
+        "&": "\\u0026",
+        "\u2028": "\\u2028",
+        "\u2029": "\\u2029"
+      };
+      return replacements[char];
+    });
+  next();
+});
+
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method) || csrfExemptPaths.has(req.path)) {
+    return next();
+  }
+
+  const submittedToken = req.body?._csrf || req.get("X-CSRF-Token");
+  if (!req.session.csrfSecret || !submittedToken || !tokens.verify(req.session.csrfSecret, submittedToken)) {
+    return res.status(403).json({ success: false, message: "Invalid CSRF token" });
+  }
+
   next();
 });
 
@@ -74,17 +134,13 @@ const ACCOUNT_LOCKOUT = {
 // Store failed login attempts
 const failedLoginAttempts = new Map();
 
-// MongoDB Configuration - Fixed URI construction
-const PASS = process.env.MONGODB_PASS;
-const uri = `mongodb+srv://Admin:${PASS}@cluster0.ak6hid0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
 // MongoDB Connection Pool - Fixed initialization
 let mongoClient;
 let db;
 
 async function initializeMongoDB() {
   try {
-    mongoClient = new MongoClient(uri, {
+    mongoClient = new MongoClient(MONGODB_URI, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -98,13 +154,12 @@ async function initializeMongoDB() {
 
     await mongoClient.connect();
     db = mongoClient.db("user-details");
+    await db.collection("details").createIndex({ username: 1 }, { unique: true });
+    await db.collection("details").createIndex({ email: 1 }, { unique: true });
   } catch (error) {
     process.exit(1);
   }
 }
-
-// Initialize MongoDB on startup
-initializeMongoDB().catch(console.error);
 
 // Cleanup on application shutdown
 process.on('SIGINT', async () => {
@@ -170,6 +225,7 @@ app.use((req, res, next) => {
   res.header("X-Frame-Options", "DENY");
   res.header("X-XSS-Protection", "1; mode=block");
   res.locals.isLoggedIn = req.session.username !== undefined;
+  res.locals.currentPath = req.path;
   next();
 });
 
@@ -180,24 +236,38 @@ const loginLimiter = RateLimit({
   message: 'Too many login attempts, please try again later.'
 });
 
+const passwordRecoveryLimiter = RateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: 'Too many password recovery attempts, please try again later.'
+});
+
 // Enhanced input validation middleware
 const validateLogin = [
-  body('username').trim().notEmpty().withMessage('Username or email is required'),
-  body('password').notEmpty().withMessage('Password is required')
+  body('username').isString().trim().notEmpty().isLength({ max: 254 }).withMessage('Username or email is required'),
+  body('password').isString().notEmpty().isLength({ max: 256 }).withMessage('Password is required')
 ];
 
 // Enhanced signup validation middleware
 const validateSignup = [
+  body('firstName').isString().trim().isLength({ min: 1, max: 80 }).withMessage('First name is required'),
+  body('lastName').isString().trim().isLength({ min: 1, max: 80 }).withMessage('Last name is required'),
   body('email')
+    .isString()
     .isEmail()
     .normalizeEmail()
     .withMessage('Please enter a valid email address'),
+  body('phoneNumber').isString().trim().isLength({ min: 7, max: 30 }).withMessage('Please enter a valid phone number'),
+  body('address').isString().trim().isLength({ min: 3, max: 200 }).withMessage('Please enter a valid address'),
+  body('postalCode').isString().trim().isLength({ min: 3, max: 20 }).withMessage('Please enter a valid postal code'),
   body('username')
-    .isLength({ min: 3 })
+    .isString()
     .trim()
-    .escape()
-    .withMessage('Username must be at least 3 characters long'),
+    .isLength({ min: 3, max: 40 })
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage('Username must be 3-40 characters and use only letters, numbers, dots, underscores, or hyphens'),
   body('password')
+    .isString()
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')
     .matches(/[A-Z]/)
@@ -209,6 +279,102 @@ const validateSignup = [
     .matches(/[!@#$%^&*(),.?":{}|<>]/)
     .withMessage('Password must contain at least one special character')
 ];
+
+const validateProfileUpdate = [
+  body('firstName').isString().trim().isLength({ min: 1, max: 80 }).withMessage('First name is required'),
+  body('lastName').isString().trim().isLength({ min: 1, max: 80 }).withMessage('Last name is required'),
+  body('email').isString().isEmail().normalizeEmail().withMessage('Please enter a valid email address'),
+  body('phoneNumber').isString().trim().isLength({ min: 7, max: 30 }).withMessage('Please enter a valid phone number'),
+  body('address').isString().trim().isLength({ min: 3, max: 200 }).withMessage('Please enter a valid address'),
+  body('postalCode').isString().trim().isLength({ min: 3, max: 20 }).withMessage('Please enter a valid postal code'),
+  body('username')
+    .isString()
+    .trim()
+    .isLength({ min: 3, max: 40 })
+    .matches(/^[a-zA-Z0-9_.-]+$/)
+    .withMessage('Username must be 3-40 characters and use only letters, numbers, dots, underscores, or hyphens')
+];
+
+const validateContact = [
+  body('subject').isString().trim().isLength({ min: 1, max: 200 }).withMessage('Subject is required'),
+  body('email').isString().trim().isEmail().normalizeEmail().withMessage('Please enter a valid email address'),
+  body('message').isString().trim().isLength({ min: 1, max: 5000 }).withMessage('Message is required')
+];
+
+const validateForgotPasswordEmail = [
+  body('email').isString().trim().isEmail().normalizeEmail().withMessage('Please enter a valid email address')
+];
+
+const validateVerificationCode = [
+  body('codeValue').isString().trim().matches(/^\d{6}$/).withMessage('Invalid verification code')
+];
+
+const validateBooking = [
+  body('selectedDay').isInt({ min: 0, max: 30 }).withMessage('Invalid day'),
+  body('viewingMonth').isInt({ min: 0, max: 1 }).withMessage('Invalid month'),
+  body('selectedTimeSlot').isInt({ min: 0, max: 2 }).withMessage('Invalid time slot'),
+  body('detailType').isInt({ min: 0, max: 3 }).withMessage('Invalid detail type')
+];
+
+const validateConfirmationEmail = [
+  body('day').isString().trim().isLength({ min: 1, max: 2 }).matches(/^\d{1,2}$/).withMessage('Invalid day'),
+  body('month').isString().trim().isLength({ min: 3, max: 20 }).matches(/^[a-zA-Z]+$/).withMessage('Invalid month'),
+  body('time').isString().trim().isLength({ min: 3, max: 20 }).matches(/^[a-zA-Z0-9 :]+$/).withMessage('Invalid time'),
+  body('detail').isString().trim().isLength({ min: 3, max: 80 }).matches(/^[a-zA-Z0-9 ]+$/).withMessage('Invalid detail')
+];
+
+function normalizeUsername(username) {
+  return String(username).trim().toLowerCase();
+}
+
+function requireAuth(req, res, next) {
+  if (!req.session.username) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.session.username) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  if (!ADMIN_USERNAMES.has(normalizeUsername(req.session.username))) {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  next();
+}
+
+function buildUserData(user) {
+  return {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phoneNum: user.phoneNumber,
+    adr: user.address,
+    pCode: user.postalCode,
+    userName: user.username
+  };
+}
+
+function pickUserFields(formData) {
+  return {
+    firstName: String(formData.firstName).trim(),
+    lastName: String(formData.lastName).trim(),
+    email: String(formData.email).trim().toLowerCase(),
+    phoneNumber: String(formData.phoneNumber).trim(),
+    address: String(formData.address).trim(),
+    postalCode: String(formData.postalCode).trim(),
+    username: normalizeUsername(formData.username)
+  };
+}
+
+function handleValidationErrors(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  }
+  next();
+}
 
 // Check if account is locked
 function isAccountLocked(username) {
@@ -248,7 +414,7 @@ async function checkUserLogin(user, pass, req, res) {
     }
 
     // Sanitize user input
-    const sanitizedUser = String(user).trim().toLowerCase();
+    const sanitizedUser = normalizeUsername(user);
 
     // Check for account lockout
     if (isAccountLocked(sanitizedUser)) {
@@ -278,15 +444,16 @@ async function checkUserLogin(user, pass, req, res) {
     }
 
     // Check if the stored password is a bcrypt hash
-    const isBcryptHash = query.password.startsWith('$2');
+    const storedPassword = typeof query.password === "string" ? query.password : "";
+    const isBcryptHash = storedPassword.startsWith('$2');
 
     let passwordMatch;
     if (isBcryptHash) {
       // If it's already a bcrypt hash, compare normally
-      passwordMatch = await bcrypt.compare(pass, query.password);
+      passwordMatch = await bcrypt.compare(pass, storedPassword);
     } else {
       // If it's plain text, compare directly and update to hash
-      passwordMatch = pass === query.password;
+      passwordMatch = pass === storedPassword;
       if (passwordMatch) {
         // Update the password to be a bcrypt hash
         const hashedPassword = await bcrypt.hash(pass, 10);
@@ -299,15 +466,7 @@ async function checkUserLogin(user, pass, req, res) {
 
     if (passwordMatch) {
       resetFailedAttempts(rateLimitKey);
-      const userData = {
-        firstName: query.firstName,
-        lastName: query.lastName,
-        email: query.email,
-        phoneNum: query.phoneNumber,
-        adr: query.address,
-        pCode: query.postalCode,
-        userName: query.username
-      };
+      const userData = buildUserData(query);
       return { success: true, userData: userData };
     } else {
       updateFailedAttempts(rateLimitKey);
@@ -363,20 +522,19 @@ app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
       });
     }
 
-    // Set session data
-    req.session.username = result.userData.userName;
-    req.session.userData = {
-      firstName: result.userData.firstName,
-      lastName: result.userData.lastName,
-      email: result.userData.email,
-      phoneNum: result.userData.phoneNum,
-      adr: result.userData.adr,
-      pCode: result.userData.pCode,
-      userName: result.userData.userName
-    };
+    req.session.regenerate((regenerateError) => {
+      if (regenerateError) {
+        return res.json({
+          success: false,
+          message: 'Failed to establish session'
+        });
+      }
 
-    // Force session save
-    req.session.save((err) => {
+      req.session.csrfSecret = crypto.randomBytes(32).toString('hex');
+      req.session.username = result.userData.userName;
+      req.session.userData = result.userData;
+
+      req.session.save((err) => {
       if (err) {
         return res.json({
           success: false,
@@ -388,6 +546,7 @@ app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
         success: true,
         redirect: '/profile'
       });
+    });
     });
   } catch (error) {
     res.json({
@@ -468,7 +627,7 @@ app.get("/logout", (req, res) => {
     if (err) {
       console.error("Error destroying session:", err);
     }
-    res.clearCookie('connect.sid');
+    res.clearCookie(COOKIE_NAME);
     res.redirect("/login");
   });
 });
@@ -481,29 +640,29 @@ app.post("/sign-up-form", validateSignup, async (req, res) => {
   }
 
   try {
-    const formData = req.body;
-    const username = req.body.username;
+    const formData = pickUserFields(req.body);
+    const username = formData.username;
+    const password = String(req.body.password);
 
-    let usernameTaken = await checkValidUsername(username);
+    const usernameTaken = await checkValidUsername(username);
+    const emailTaken = await checkEmailExists(formData.email);
 
-    if (usernameTaken === false) {
-      const hashedPassword = await bcrypt.hash(formData.password, 10);
+    if (!usernameTaken && !emailTaken) {
+      const hashedPassword = await bcrypt.hash(password, 12);
       formData.password = hashedPassword;
 
       await saveDetails(formData);
 
-      req.session.username = formData.username;
-      req.session.userData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phoneNum: formData.phoneNumber,
-        adr: formData.address,
-        pCode: formData.postalCode,
-        userName: formData.username
-      };
+      req.session.regenerate((regenerateError) => {
+        if (regenerateError) {
+          return res.status(500).send("Error creating session.");
+        }
 
-      res.redirect("/profile");
+        req.session.csrfSecret = crypto.randomBytes(32).toString('hex');
+        req.session.username = formData.username;
+        req.session.userData = buildUserData(formData);
+        res.redirect("/profile");
+      });
     } else {
       req.session.usernameTaken = true;
       res.redirect("/sign-up");
@@ -535,9 +694,9 @@ async function checkEmailExists(email) {
 }
 
 // Runs when the user submits their e-mail in the "Forgot password" page
-app.post("/forgot-password-email", async (req, res) => {
+app.post("/forgot-password-email", passwordRecoveryLimiter, validateForgotPasswordEmail, handleValidationErrors, async (req, res) => {
   const code = generateVerificationCode();
-  const customerEmail = req.body.email;
+  const customerEmail = String(req.body.email).trim().toLowerCase();
 
   try {
     const emailExists = await checkEmailExists(customerEmail);
@@ -549,6 +708,7 @@ app.post("/forgot-password-email", async (req, res) => {
       req.session.verificationCodeExpiry = Date.now() + VERIFICATION_CODE_EXPIRY_MS;
       req.session.customerEmail = customerEmail;
       req.session.codeVerified = false;
+      req.session.verificationAttempts = 0;
 
       if (!process.env.EMAIL_PASSWORD) {
         return res.status(500).send("Email service configuration error");
@@ -584,14 +744,22 @@ app.post("/forgot-password-email", async (req, res) => {
 });
 
 // Runs when the user submits the code they receive in their e-mail
-app.post("/verify-code", (req, res) => {
-  const code = req.body.codeValue;
+app.post("/verify-code", validateVerificationCode, handleValidationErrors, (req, res) => {
+  const code = String(req.body.codeValue).trim();
   const storedCode = req.session.verificationCode;
   const expiry = req.session.verificationCodeExpiry;
+  req.session.verificationAttempts = req.session.verificationAttempts || 0;
 
   // Check that a code exists, hasn't expired, and matches
   if (!storedCode || !expiry) {
     return res.send("Invalid verification code");
+  }
+
+  if (req.session.verificationAttempts >= 5) {
+    req.session.verificationCode = null;
+    req.session.verificationCodeExpiry = null;
+    req.session.codeVerified = false;
+    return res.status(429).send("Too many invalid attempts. Please request a new code.");
   }
 
   if (Date.now() > expiry) {
@@ -608,6 +776,7 @@ app.post("/verify-code", (req, res) => {
     req.session.verificationCodeExpiry = null;
     res.send("Code verified successfully");
   } else {
+    req.session.verificationAttempts++;
     res.send("Invalid verification code");
   }
 });
@@ -631,8 +800,8 @@ async function findPassword(email) {
 }
 
 // Runs after the code verification and logs the user in after everything is completed
-app.post("/login-remotely", async (req, res) => {
-  const eMail = req.body.email;
+app.post("/login-remotely", validateForgotPasswordEmail, handleValidationErrors, async (req, res) => {
+  const eMail = String(req.body.email).trim().toLowerCase();
 
   // SECURITY: Verify that the code was actually verified in this session
   // and the email matches the one that requested the code
@@ -644,20 +813,17 @@ app.post("/login-remotely", async (req, res) => {
     const result = await findPassword(eMail);
 
     if (result.success) {
+      const userData = buildUserData(result.userData);
+      req.session.regenerate((regenerateError) => {
+        if (regenerateError) {
+          return res.status(500).json({ success: false });
+        }
+
+        req.session.csrfSecret = crypto.randomBytes(32).toString('hex');
       req.session.username = result.userData.username;
-      req.session.userData = {
-        firstName: result.userData.firstName,
-        lastName: result.userData.lastName,
-        email: result.userData.email,
-        phoneNum: result.userData.phoneNumber,
-        adr: result.userData.address,
-        pCode: result.userData.postalCode,
-        userName: result.userData.username,
-      };
-      // Clear verification state
-      req.session.codeVerified = false;
-      req.session.customerEmail = null;
-      res.status(200).json({ success: true });
+        req.session.userData = userData;
+        res.status(200).json({ success: true });
+      });
     } else {
       res.status(404).json({ success: false });
     }
@@ -669,7 +835,7 @@ app.post("/login-remotely", async (req, res) => {
 // A function to send booking confirmation e-mails to the customer as well as admin
 async function sendConfirmationEmail(email, name, day, month, time, detail, address) {
   try {
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "mapleglowdetailing@gmail.com",
@@ -729,19 +895,19 @@ async function sendConfirmationEmail(email, name, day, month, time, detail, addr
   }
 }
 
-app.post("/send-confirmation-email", async (req, res) => {
+app.post("/send-confirmation-email", requireAuth, validateConfirmationEmail, handleValidationErrors, async (req, res) => {
   // Require authentication
-  if (!req.session.username || !req.session.userData) {
+  if (!req.session.userData) {
     return res.status(401).send("Authentication required");
   }
 
   try {
     const email = req.session.userData.email;
     const name = req.session.userData.firstName;
-    const day = String(req.body.day).replace(/[^a-zA-Z0-9 ]/g, '');
-    const month = String(req.body.month).replace(/[^a-zA-Z0-9 ]/g, '');
-    const time = String(req.body.time).replace(/[^a-zA-Z0-9 :]/g, '');
-    const detail = String(req.body.detail).replace(/[^a-zA-Z0-9 ]/g, '');
+    const day = String(req.body.day).trim();
+    const month = String(req.body.month).trim();
+    const time = String(req.body.time).trim();
+    const detail = String(req.body.detail).trim();
     const address = req.session.userData.adr;
 
     await sendConfirmationEmail(email, name, day, month, time, detail, address);
@@ -754,7 +920,7 @@ app.post("/send-confirmation-email", async (req, res) => {
 // Function to send a customer's inquiry
 async function sendEmail(customerEmail, subject, text) {
   try {
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "mapleglowdetailing@gmail.com",
@@ -775,17 +941,17 @@ async function sendEmail(customerEmail, subject, text) {
   }
 }
 
-app.post("/contact-form", async (req, res) => {
+app.post("/contact-form", validateContact, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors.array()[0].msg);
+  }
+
   try {
     // Sanitize inputs to prevent header injection
-    const subject = String(req.body.subject).substring(0, 200).replace(/[\r\n]/g, '');
-    const message = String(req.body.message).substring(0, 5000);
+    const subject = String(req.body.subject).trim().substring(0, 200).replace(/[\r\n]/g, '');
+    const message = String(req.body.message).trim().substring(0, 5000);
     const customerEmail = String(req.body.email).trim().toLowerCase();
-
-    // Basic email format check
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
-      return res.status(400).send("Invalid email address");
-    }
 
     await sendEmail(customerEmail, subject, message);
     res.redirect("/contact");
@@ -798,7 +964,7 @@ app.post("/contact-form", async (req, res) => {
 async function updateDetails(formData, user, req) {
   try {
     const details = db.collection("details");
-    const sanitizedUser = String(user).trim().toLowerCase();
+    const sanitizedUser = normalizeUsername(user);
     const query = { username: sanitizedUser };
 
     const result = await details.updateOne(query, { $set: formData });
@@ -808,15 +974,8 @@ async function updateDetails(formData, user, req) {
     } else {
       console.log("Update completed successfully.");
 
-      req.session.userData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phoneNum: formData.phoneNumber,
-        adr: formData.address,
-        pCode: formData.postalCode,
-        userName: formData.username,
-      };
+      req.session.username = formData.username;
+      req.session.userData = buildUserData(formData);
     }
   } catch (error) {
     throw error;
@@ -834,28 +993,33 @@ async function saveDetails(formData) {
 }
 
 // POST /save-form — Save profile edits with field whitelisting
-app.post("/save-form", async (req, res) => {
+app.post("/save-form", validateProfileUpdate, async (req, res) => {
   // Require authentication
   if (!req.session.username) {
     return res.redirect("/login");
   }
 
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors.array()[0].msg);
+  }
+
   try {
-    // Whitelist only allowed fields to prevent arbitrary field injection
-    const allowedFields = ['firstName', 'lastName', 'email', 'phoneNumber', 'address', 'postalCode', 'username'];
-    const sanitizedData = {};
-    for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        sanitizedData[field] = String(req.body[field]).trim();
-      }
+    const sanitizedData = pickUserFields(req.body);
+    const currentUsername = normalizeUsername(req.session.username);
+    const details = db.collection("details");
+    const duplicate = await details.findOne({
+      $and: [
+        { username: { $ne: currentUsername } },
+        { $or: [{ username: sanitizedData.username }, { email: sanitizedData.email }] }
+      ]
+    });
+
+    if (duplicate) {
+      return res.status(409).send("Username or email already in use");
     }
 
-    // Basic email validation
-    if (sanitizedData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedData.email)) {
-      return res.status(400).send("Invalid email address");
-    }
-
-    await updateDetails(sanitizedData, req.session.username, req);
+    await updateDetails(sanitizedData, currentUsername, req);
     res.redirect("/profile");
   } catch (error) {
     res.status(500).send("Error saving profile changes");
@@ -866,7 +1030,7 @@ app.post("/save-form", async (req, res) => {
 async function checkValidUsername(user) {
   try {
     const details = db.collection("details");
-    const sanitizedUser = String(user).trim().toLowerCase();
+    const sanitizedUser = normalizeUsername(user);
     let query = await details.findOne({ username: sanitizedUser });
     return query !== null;
   } catch (error) {
@@ -885,12 +1049,7 @@ async function getAdminSchedule() {
   }
 }
 
-app.get("/admin-schedule", async (req, res) => {
-  // Require authentication to view schedule
-  if (!req.session.username) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
-
+app.get("/admin-schedule", requireAuth, async (req, res) => {
   try {
     const adminSchedule = await getAdminSchedule();
     res.json(adminSchedule);
@@ -926,13 +1085,7 @@ async function updateDocument() {
   }
 }
 
-// SECURITY: This resets the entire schedule — restrict to authenticated admin users
-app.get("/update-admin", async (req, res) => {
-  if (!req.session.username) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
-
-  // TODO: Add admin role check here (e.g., req.session.isAdmin)
+app.post("/update-admin", requireAdmin, async (req, res) => {
   try {
     const result = await updateDocument();
 
@@ -973,7 +1126,10 @@ async function book(month, day, timeslot, detailtype, req) {
     };
 
     const result = await adminScheduleCollection.updateOne(
-      { id1: "hello" },
+      {
+        id1: "hello",
+        [`Schedule.${safeMonth}.${safeDay}.${safeTimeslot}.1`]: true
+      },
       update
     );
 
@@ -983,12 +1139,7 @@ async function book(month, day, timeslot, detailtype, req) {
   }
 }
 
-app.post("/book", async (req, res) => {
-  // Require authentication
-  if (!req.session.username) {
-    return res.status(401).json({ error: "Authentication required" });
-  }
-
+app.post("/book", requireAuth, validateBooking, handleValidationErrors, async (req, res) => {
   try {
     const { selectedDay, viewingMonth, selectedTimeSlot, detailType } =
       req.body;
@@ -1103,6 +1254,7 @@ app.post("/change-password", validatePasswordChange, async (req, res) => {
 
 // Start server with error handling
 const PORT = process.env.PORT || 3000;
+await initializeMongoDB();
 app.listen(PORT, () => {
 }).on('error', (err) => {
 });

@@ -1,15 +1,16 @@
-FROM node:20
+FROM node:20-slim
 
-WORKDIR /ICS4UFinal
+ENV NODE_ENV=production
 
-COPY package.json .
+WORKDIR /app
 
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
 
-COPY . .
+COPY --chown=node:node . .
 
 EXPOSE 3000
 
 USER node
 
-CMD ["node", "index.js"]
+CMD ["npm", "start"]

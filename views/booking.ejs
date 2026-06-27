@@ -9,11 +9,12 @@
 
     <div class="fade-in-container">
 
-        <h1 class="title">Book a detail with us.</h1>
+        <h1 class="title">Book a detail</h1>
 
         <div class="booking-grid">
 
             <div class="options"> <!-- 4 detailing options. -->
+                <h2 class="section-heading">Choose a package</h2>
 
                 <div>
                     <button class="booking-button-option" onclick="updateSelectedDetail(1)" id="btn1">
@@ -119,7 +120,7 @@
 
                 <br>
 
-                <h2>Select a time.</h2>
+                <h2 class="section-heading compact-heading">Choose a time</h2>
 
                 <div class="time-slot-container"> <!-- Timeslot container.-->
                     <button class="timeSlotButton" id="time1" onclick="updateSelectedTime(1)">*</button>
@@ -157,14 +158,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const selectedButton = urlParams.get('selectedButton');
     if (selectedButton) {
-        detailType = selectedButton - 1;
-        const btn = document.getElementById("btn" + selectedButton);
-        btn.style.backgroundColor = "#00b4d8";
-        for (let i = 1; i < 5; i++) {
-            if (i != selectedButton) {
-                document.getElementById("btn" + i).style.backgroundColor = "#e7e7e7";
-            }
-        }
+        updateSelectedDetail(Number(selectedButton));
     }
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -198,16 +192,21 @@
             updateCalendar(0);
         } catch (error) {
             console.error("Error getting admin schedule:", error);
-            document.getElementById('adminScheduleResult').innerHTML = "Error getting admin schedule.";
         }
     }
 
     async function resetDatabase() { // Fully resets the database (not viewable to user).
         try {
-            const response = await fetch('/update-admin');
+            const response = await fetch('/update-admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<%= csrfToken %>'
+                },
+                body: JSON.stringify({ _csrf: '<%= csrfToken %>' })
+            });
         } catch (error) {
             console.error("Error getting admin schedule:", error);
-            document.getElementById('adminScheduleResult').innerHTML = "Error getting admin schedule.";
         }
     }
 
@@ -323,28 +322,21 @@
         // Disable the buttons on timeslots that are not availible. 
         if (adminSchedule.Schedule[viewingMonth][selectedDay][0][1] == false) {
             element1.disabled = true;
-            element1.style.backgroundColor = "#e7e7e7";
         }
         else {
             element1.disabled = false;
-            element1.style.backgroundColor = "#0071e3";
-
         }
         if (adminSchedule.Schedule[viewingMonth][selectedDay][1][1] == false) {
             element2.disabled = true;
-            element2.style.backgroundColor = "#e7e7e7";
         }
         else {
             element2.disabled = false;
-            element2.style.backgroundColor = "#0071e3";
         }
         if (adminSchedule.Schedule[viewingMonth][selectedDay][2][1] == false) {
             element3.disabled = true;
-            element3.style.backgroundColor = "#e7e7e7";
         }
         else {
             element3.disabled = false;
-            element3.style.backgroundColor = "#0071e3";
         }
 
         document.getElementById("time1").textContent = "12 PM";
@@ -358,12 +350,9 @@
         if (pressed.innerHTML.trim() !== "") {
             for (let i = 0; i < 37; i++) {
                 let cell = document.getElementById(i.toString());
-                cell.style.backgroundColor = "transparent";
-                cell.style.color = "inherit";
+                cell.setAttribute("aria-pressed", "false");
             }
-            pressed.style.backgroundColor = "var(--primary)";
-            pressed.style.color = "white";
-            pressed.style.borderRadius = "12px";
+            pressed.setAttribute("aria-pressed", "true");
         }
     }
 
@@ -371,8 +360,7 @@
         selectedDay = undefined;
         for (let i = 0; i < 37; i++) {
             let cell = document.getElementById(i.toString());
-            cell.style.backgroundColor = "transparent";
-            cell.style.color = "inherit";
+            cell.setAttribute("aria-pressed", "false");
             cell.style.visibility = "visible";
         }
     }
@@ -380,13 +368,11 @@
     function updateSelectedTime(id) { // Highlights the selected timeslot. 
         selectedTimeSlot = id - 1;
         let pressed = document.getElementById("time" + id);
-        pressed.style.backgroundColor = "var(--primary)";
-        pressed.style.color = "white";
+        pressed.setAttribute("aria-pressed", "true");
         for (let i = 1; i < 4; i++) {
             if (i !== id) {
                 let btn = document.getElementById("time" + i);
-                btn.style.backgroundColor = "var(--bg-secondary)";
-                btn.style.color = "var(--text-secondary)";
+                btn.setAttribute("aria-pressed", "false");
             }
         }
     }
@@ -395,18 +381,17 @@
         selectedTimeSlot = undefined;
         for (let i = 1; i < 4; i++) {
             let btn = document.getElementById("time" + i);
-            btn.style.backgroundColor = "var(--primary-light)";
-            btn.style.color = "var(--primary)";
+            btn.setAttribute("aria-pressed", "false");
         }
     }
 
     function updateSelectedDetail(id) { // Highlights the selected detail. 
         detailType = id - 1;
         let pressed = document.getElementById("btn" + id);
-        pressed.style.backgroundColor = "#00b4d8";
+        pressed.setAttribute("aria-pressed", "true");
         for (let i = 1; i < 5; i++) {
             if (i != id) {
-                document.getElementById("btn" + i).style.backgroundColor = "#e7e7e7";
+                document.getElementById("btn" + i).setAttribute("aria-pressed", "false");
             }
         }
     }
@@ -417,8 +402,9 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "X-CSRF-Token": "<%= csrfToken %>"
                 },
-                body: JSON.stringify({ day, month, time, detail }),
+                body: JSON.stringify({ day, month, time, detail, _csrf: "<%= csrfToken %>" }),
             });
 
             const result = await response.json();

@@ -56,6 +56,7 @@
                 <button id="editButton" class="profile-page-buttons" onclick="edit()">Edit</button>
                 <!-- Hidden information form with "Save" button. -->
                 <form action="/save-form" method="post" onsubmit="return checkFields()">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <button id="saveButton" class="save-button-disabled" onclick="save()" disabled>Save</button>
                     <input type="text" id="firstNameHidden" name="firstName" hidden><br>
                     <input type="text" id="lastNameHidden" name="lastName" hidden><br>
@@ -150,12 +151,12 @@
     }
 
     function checkFields() {
-        const email = email.value;
+        const emailValue = email.value;
         if (
-            email.includes("@gmail.com") ||
-            email.includes("@yahoo.com") ||
-            email.includes("@outlook.com") ||
-            email.includes("@icloud.com")
+            emailValue.includes("@gmail.com") ||
+            emailValue.includes("@yahoo.com") ||
+            emailValue.includes("@outlook.com") ||
+            emailValue.includes("@icloud.com")
         ) {
             disableInputs();
             return true;
@@ -259,13 +260,14 @@
     }
 
     //Visible form on the profile page, pulls information from the session varaible "userData".
-    firstName.value = "<%= userData.firstName %>";
-    lastName.value = "<%= userData.lastName %>";
-    email.value = "<%= userData.email %>";
-    phoneNumber.value = "<%= userData.phoneNum %>";
-    address.value = "<%= userData.adr %>";
-    postalCode.value = "<%= userData.pCode %>";
-    username.value = "<%= userData.userName %>";
+    const profileData = <%- json(userData) %>;
+    firstName.value = profileData.firstName || "";
+    lastName.value = profileData.lastName || "";
+    email.value = profileData.email || "";
+    phoneNumber.value = profileData.phoneNum || "";
+    address.value = profileData.adr || "";
+    postalCode.value = profileData.pCode || "";
+    username.value = profileData.userName || "";
 
     //Hidden form on the profile page so that edits can be saved to the database, and then updated on the visible form afterwards.
     document.getElementById("usernameHidden").value = username.value;

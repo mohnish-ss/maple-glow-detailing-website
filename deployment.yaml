@@ -23,11 +23,19 @@ spec:
               cpu: "500m"
               memory: "512Mi"
           env:
+            - name: NODE_ENV
+              value: production
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: maple-glow-secrets
+                  key: MONGODB_URI
             - name: MONGODB_PASS
               valueFrom:
                 secretKeyRef:
                   name: maple-glow-secrets
                   key: MONGODB_PASS
+                  optional: true
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:

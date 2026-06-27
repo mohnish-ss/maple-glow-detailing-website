@@ -57,10 +57,13 @@
         <div class="form-wrapper">
           <form class="contact-form" id="contact-form" action="/contact-form" method="post">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="field-label" for="subject">Subject</label>
             <input class="input-box form-input-box" name="subject" id="subject" placeholder="Subject" required>
             <br><br>
+            <label class="field-label" for="email">Email</label>
             <input class="input-box form-input-box" name="email" id="email" placeholder="E-mail" required>
             <br><br>
+            <label class="field-label" for="text">Message</label>
             <textarea name="message" id="text" class="input-box form-input" placeholder="Message" required></textarea>
             <br><br>
             <button class="contact-form-submit-button" type="submit">Submit</button>
