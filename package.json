@@ -42,9 +42,9 @@
         "filelist": {
             "minimatch": "5.1.9"
         },
-        "brace-expansion": "1.1.15",
+        "brace-expansion": "1.1.16",
         "minimatch@3.1.5": {
-            "brace-expansion": "1.1.15"
+            "brace-expansion": "1.1.16"
         },
         "minimatch@5.1.9": {
             "brace-expansion": "2.1.1"
