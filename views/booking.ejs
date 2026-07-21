@@ -1,73 +1,108 @@
 <!DOCTYPE html>
+<html>
 
 <head>
     <%- include('layouts/navbar'); -%>
-        <title>Booking</title>
+    <title>Book a Detail | Maple Glow</title>
 </head>
 
 <body>
-
     <div class="fade-in-container">
 
-        <h1 class="title">Book a detail</h1>
+        <div class="booking-page-header" style="text-align: center; margin-bottom: 2rem; padding-top: 1rem;">
+            <h1 class="title" style="margin-bottom: 0.5rem;">Book a Detail</h1>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem;">
+                Select your detailing package, pick an available date on the calendar, and choose your preferred time slot.
+            </p>
+        </div>
 
         <div class="booking-grid">
 
-            <div class="options"> <!-- 4 detailing options. -->
-                <h2 class="section-heading">Choose a package</h2>
+            <!-- Step 1: Package Options -->
+            <div class="options-container">
+                <h2 class="section-heading" style="margin-bottom: 1.25rem;">1. Choose a package</h2>
 
-                <div>
-                    <button class="booking-button-option" onclick="updateSelectedDetail(1)" id="btn1">
-                        <h1 id="d1">Interior</h1>
-                        <p class="button-option-text">Elevate your ride's interior with our Detailing service.
-                            We'll
-                            clean, vacuum, and restore, keeping it straightforward and effective.</p>
-                    </button>
+                <div class="package-list">
+                    <div class="estimate-card" onclick="updateSelectedDetail(1)" id="btn1" role="button" tabindex="0">
+                        <div class="estimate-card-top">
+                            <div class="feature-icon-circle">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <span class="package-price">$100</span>
+                        </div>
+                        <h3 id="d1" class="estimate-card-title">Interior</h3>
+                        <p class="estimate-card-desc">Elevate your ride's interior with our detailing service. We'll clean, vacuum, and restore, keeping it straightforward and effective.</p>
+                    </div>
+
+                    <div class="estimate-card" onclick="updateSelectedDetail(2)" id="btn2" role="button" tabindex="0">
+                        <div class="estimate-card-top">
+                            <div class="feature-icon-circle">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+                                    <path d="M15 18H9"></path>
+                                    <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.24-4.04a1 1 0 0 0-.78-.34H15"></path>
+                                    <circle cx="7" cy="18" r="2"></circle>
+                                    <circle cx="17" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <span class="package-price">$100</span>
+                        </div>
+                        <h3 id="d2" class="estimate-card-title">Exterior</h3>
+                        <p class="estimate-card-desc">Boost your car's street appeal with our exterior detailing. A simple wash, wax, and buff to make it shine without unnecessary frills.</p>
+                    </div>
+
+                    <div class="estimate-card" onclick="updateSelectedDetail(3)" id="btn3" role="button" tabindex="0">
+                        <div class="estimate-card-top">
+                            <div class="feature-icon-circle">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                            </div>
+                            <span class="package-price">$200</span>
+                        </div>
+                        <h3 id="d3" class="estimate-card-title">Full Package</h3>
+                        <p class="estimate-card-desc">Give your vehicle an all-around refresh with our full detailing. No fluff, just a thorough inside-out clean for a sleek look.</p>
+                    </div>
+
+                    <div class="estimate-card" onclick="updateSelectedDetail(4)" id="btn4" role="button" tabindex="0">
+                        <div class="estimate-card-top">
+                            <div class="feature-icon-circle">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="5"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                </svg>
+                            </div>
+                            <span class="package-price">$50</span>
+                        </div>
+                        <h3 id="d4" class="estimate-card-title">Headlight Polish</h3>
+                        <p class="estimate-card-desc">Enhance your night driving visibility with our headlight polishing. Clearing up headlights without the fuss.</p>
+                    </div>
                 </div>
-
-                <div>
-                    <button class="booking-button-option " onclick="updateSelectedDetail(2)" id="btn2">
-                        <h1 id="d2">Exterior</h1>
-                        <p class="button-option-text">Boost your car's street appeal with our Exterior
-                            Detailing. A
-                            simple wash, wax, and buff to make it shine without unnecessary frills.</p>
-                    </button>
-                </div>
-
-                <div>
-                    <button class="booking-button-option" onclick="updateSelectedDetail(3)" id="btn3">
-                        <h1 id="d3">Full Package</h1>
-                        <p class="button-option-text">Give your vehicle an all-around refresh with our Full
-                            Detailing. No fluff, just a thorough inside-out clean for a sleek look.</p>
-                    </button>
-                </div>
-
-                <div>
-                    <button class="booking-button-option" onclick="updateSelectedDetail(4)" id="btn4">
-                        <h1 id="d4">Headlight Polish</h1>
-                        <p class="button-option-text">Enhance your night driving visibility with our Headlight
-                            Polishing. Clearing up headlights without the fuss.</p>
-                    </button>
-                </div>
-
-
             </div>
 
+            <!-- Step 2 & 3: Calendar & Time Selection -->
             <div class="calendar-big-container">
+                <h2 class="section-heading" style="margin-bottom: 1.25rem; width: 100%;">2. Select date & time</h2>
 
-                <div> <!-- Month switching buttons. -->
-                    <button class="calendarUpdateButton" onclick="updateCalendar(0)">Previous Month</button>
-                    <button class="calendarUpdateButton" onclick="updateCalendar(1)">Next Month</button>
-                </div>
+                <div class="calendar-container" style="width: 100%;">
+                    
+                    <div class="month-nav" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <button class="calendarUpdateButton" onclick="updateCalendar(0)" id="prevMonthBtn">‹ Prev Month</button>
+                        <h2 class="viewingmonth" id="viewingmonth" style="margin: 0; font-size: 1.25rem;"></h2>
+                        <button class="calendarUpdateButton" onclick="updateCalendar(1)" id="nextMonthBtn">Next Month ›</button>
+                    </div>
 
-                <br>
-
-                <div class="calendar-container">
-
-                    <h2 class="viewingmonth" id="viewingmonth"></h2>
-
-                    <div class="calendar-grid"> <!-- Calendar Initialization. -->
-
+                    <div class="calendar-grid">
                         <div>Sun</div>
                         <div>Mon</div>
                         <div>Tue</div>
@@ -113,57 +148,123 @@
                         <button id="34" class="day" onclick="getDay(34)"></button>
                         <button id="35" class="day" onclick="getDay(35)"></button>
                         <button id="36" class="day" onclick="getDay(36)"></button>
-
                     </div>
 
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <h4 style="margin-bottom: 0.75rem; color: var(--text-primary); font-size: 0.95rem;">Select Time Slot</h4>
+                        <div class="time-slot-container">
+                            <button class="timeSlotButton" id="time1" onclick="updateSelectedTime(1)">12 PM</button>
+                            <button class="timeSlotButton" id="time2" onclick="updateSelectedTime(2)">3 PM</button>
+                            <button class="timeSlotButton" id="time3" onclick="updateSelectedTime(3)">6 PM</button>
+                        </div>
+                    </div>
                 </div>
 
-                <br>
-
-                <h2 class="section-heading compact-heading">Choose a time</h2>
-
-                <div class="time-slot-container"> <!-- Timeslot container.-->
-                    <button class="timeSlotButton" id="time1" onclick="updateSelectedTime(1)">*</button>
-                    <button class="timeSlotButton" id="time2" onclick="updateSelectedTime(2)">*</button>
-                    <button class="timeSlotButton" id="time3" onclick="updateSelectedTime(3)">*</button>
+                <!-- Booking Summary Card -->
+                <div class="booking-summary-card" style="width: 100%; margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem 1.5rem;">
+                    <h3 style="margin-top: 0; margin-bottom: 0.75rem; font-size: 1.1rem; color: var(--text-primary);">Booking Summary</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                        <div><strong>Package:</strong> <span id="summaryPackage">None selected</span></div>
+                        <div><strong>Date:</strong> <span id="summaryDate">None selected</span></div>
+                        <div><strong>Time:</strong> <span id="summaryTime">None selected</span></div>
+                    </div>
+                    <button class="calendarUpdateButton" onclick="book()" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 700; background-color: var(--primary); color: #ffffff;">Confirm Booking</button>
                 </div>
-
-                <br><br>
-
-                <button class="calendarUpdateButton" onclick="book()">Book</button>
-
-                <br><br>
 
             </div>
 
         </div>
 
-        <!-- Reset booked dates in calendar, in case testing was done on it. -->
-        <!-- <button onclick="resetDatabase()"></button> -->
-
     </div>
 
+    <!-- Custom WebApp Modal Popup -->
+    <div id="customModalOverlay" class="custom-modal-overlay" style="display: none;">
+        <div class="custom-modal-card">
+            <div id="modalIconContainer" class="modal-icon-container"></div>
+            <h2 id="modalTitle" class="modal-title"></h2>
+            <p id="modalMessage" class="modal-message"></p>
+            <button id="modalActionButton" class="modal-action-button" onclick="closeCustomModal()">OK</button>
+        </div>
+    </div>
 </body>
-
-
 
 <script>
     // Store booking information
-    let viewingMonth;
+    let viewingMonth = 0;
     let selectedDay;
     let selectedTimeSlot;
     let detailType;
+    let modalCallback = null;
 
-    // Searches webpage URL to determine if the user selected something from the estimate page.
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedButton = urlParams.get('selectedButton');
-    if (selectedButton) {
-        updateSelectedDetail(Number(selectedButton));
+    const packagePrices = ["$100", "$100", "$200", "$50"];
+
+    function showCustomModal({ iconType, title, message, buttonText, onConfirm }) {
+        const overlay = document.getElementById("customModalOverlay");
+        const iconContainer = document.getElementById("modalIconContainer");
+        const titleEl = document.getElementById("modalTitle");
+        const messageEl = document.getElementById("modalMessage");
+        const actionBtn = document.getElementById("modalActionButton");
+
+        modalCallback = onConfirm || null;
+
+        iconContainer.className = "modal-icon-container " + (iconType || "success");
+        if (iconType === "success") {
+            iconContainer.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else {
+            iconContainer.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        }
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        actionBtn.textContent = buttonText || "OK";
+
+        overlay.style.display = "flex";
+        requestAnimationFrame(() => {
+            overlay.classList.add("show");
+        });
+    }
+
+    function closeCustomModal() {
+        const overlay = document.getElementById("customModalOverlay");
+        overlay.classList.remove("show");
+        setTimeout(() => {
+            overlay.style.display = "none";
+            if (modalCallback) {
+                const cb = modalCallback;
+                modalCallback = null;
+                cb();
+            }
+        }, 300);
+    }
+
+    function updateSummaryDisplay() {
+        const summaryPackage = document.getElementById("summaryPackage");
+        const summaryDate = document.getElementById("summaryDate");
+        const summaryTime = document.getElementById("summaryTime");
+
+        if (detailType !== undefined && detailType >= 0) {
+            const detailName = document.getElementById("d" + (detailType + 1)).textContent;
+            summaryPackage.textContent = `${detailName} (${packagePrices[detailType]})`;
+        } else {
+            summaryPackage.textContent = "None selected";
+        }
+
+        if (selectedDay !== undefined && selectedDay >= 0 && globalMonth) {
+            summaryDate.textContent = `${globalMonth} ${selectedDay + 1}`;
+        } else {
+            summaryDate.textContent = "None selected";
+        }
+
+        if (selectedTimeSlot !== undefined && selectedTimeSlot >= 0) {
+            const timeStr = document.getElementById("time" + (selectedTimeSlot + 1)).textContent;
+            summaryTime.textContent = timeStr;
+        } else {
+            summaryTime.textContent = "None selected";
+        }
     }
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    // Initialization of current and next month information.
     let month;
     let daysInMonth;
     let firstDay;
@@ -171,7 +272,6 @@
     let nextDaysInMonth;
     let nextFirstDay;
 
-    // Initalization of dates to setup calendar. 
     const currentMonthDate = new Date();
     const nextMonthDate = new Date();
     const today = new Date();
@@ -179,13 +279,18 @@
     let globalMonth = "";
     let adminSchedule;
 
-    // Initialization of calendar for this month and next month reading from the Database.
     updateCurrentInfo();
     updateNextInfo();
     getAdminSchedule();
 
-    // FUNCTIONS
-    async function getAdminSchedule() { // Fethches database and stores it.
+    // Check query params after setup
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedButton = urlParams.get('selectedButton');
+    if (selectedButton) {
+        updateSelectedDetail(Number(selectedButton));
+    }
+
+    async function getAdminSchedule() {
         try {
             const response = await fetch('/admin-schedule');
             adminSchedule = await response.json();
@@ -195,25 +300,10 @@
         }
     }
 
-    async function resetDatabase() { // Fully resets the database (not viewable to user).
-        try {
-            const response = await fetch('/update-admin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': '<%= csrfToken %>'
-                },
-                body: JSON.stringify({ _csrf: '<%= csrfToken %>' })
-            });
-        } catch (error) {
-            console.error("Error getting admin schedule:", error);
-        }
-    }
-
-    function updateCalendar(currentOrNext) { // Updates the calendar visuals and dates of the month of the calendar are being displayed.
+    function updateCalendar(currentOrNext) {
         if (currentOrNext != viewingMonth) {
             resetSelected();
-            resetSelectedTime()
+            resetSelectedTime();
         }
 
         clearCalendar();
@@ -221,35 +311,40 @@
         if (currentOrNext == 0) { // Current month
             document.getElementById("viewingmonth").innerHTML = monthNames[month];
             globalMonth = monthNames[month];
-            let counter = firstDay;
             for (let i = 0; i < daysInMonth; i++) {
                 let day = i + 1;
                 let tempDay = document.getElementById((firstDay + i).toString());
                 tempDay.textContent = day;
+                tempDay.disabled = false;
             }
 
-            for (let i = 0; i < daysInMonth; i++) {
-                if (adminSchedule.Schedule[0][i][0][1] == false && adminSchedule.Schedule[0][i][1][1] == false && adminSchedule.Schedule[0][i][2][1] == false) {
-                    document.getElementById(i + firstDay).disabled = true;
-                }
-                if (document.getElementById(i + firstDay).innerHTML < today.getDate() + 7) {
-                    document.getElementById(i + firstDay).disabled = true;
+            if (adminSchedule && adminSchedule.Schedule && adminSchedule.Schedule[0]) {
+                for (let i = 0; i < daysInMonth; i++) {
+                    const dayElem = document.getElementById((i + firstDay).toString());
+                    if (adminSchedule.Schedule[0][i][0][1] == false && adminSchedule.Schedule[0][i][1][1] == false && adminSchedule.Schedule[0][i][2][1] == false) {
+                        dayElem.disabled = true;
+                    }
+                    if (Number(dayElem.textContent) < today.getDate() + 7) {
+                        dayElem.disabled = true;
+                    }
                 }
             }
         }
-
         else { // Next month
             document.getElementById("viewingmonth").innerHTML = monthNames[nextMonth];
             globalMonth = monthNames[nextMonth];
-            let counter = nextFirstDay;
             for (let i = 0; i < nextDaysInMonth; i++) {
                 let tempDay = document.getElementById((nextFirstDay + i).toString());
                 tempDay.textContent = i + 1;
-                document.getElementById(i + nextFirstDay).disabled = false;
+                tempDay.disabled = false;
             }
-            for (let i = 0; i < nextDaysInMonth; i++) {
-                if (adminSchedule.Schedule[1][i][0][1] == false && adminSchedule.Schedule[1][i][1][1] == false && adminSchedule.Schedule[1][i][2][1] == false) {
-                    document.getElementById(i + nextFirstDay).disabled = true;
+
+            if (adminSchedule && adminSchedule.Schedule && adminSchedule.Schedule[1]) {
+                for (let i = 0; i < nextDaysInMonth; i++) {
+                    const dayElem = document.getElementById((i + nextFirstDay).toString());
+                    if (adminSchedule.Schedule[1][i][0][1] == false && adminSchedule.Schedule[1][i][1][1] == false && adminSchedule.Schedule[1][i][2][1] == false) {
+                        dayElem.disabled = true;
+                    }
                 }
             }
         }
@@ -262,23 +357,25 @@
         }
 
         viewingMonth = currentOrNext;
+        updateSummaryDisplay();
     }
 
-    function clearCalendar() { // Resets the calendar fully. 
+    function clearCalendar() {
         for (let i = 0; i < 37; i++) {
             let tempDay = document.getElementById(i.toString());
             tempDay.textContent = "";
+            tempDay.style.visibility = "visible";
         }
     }
 
-    function updateCurrentInfo() { // Initializes correct values for the current month.
+    function updateCurrentInfo() {
         currentMonthDate.setDate(1);
         month = currentMonthDate.getMonth();
         daysInMonth = getDaysInMonth(currentMonthDate.getFullYear(), currentMonthDate.getMonth());
         firstDay = currentMonthDate.getDay();
     }
 
-    function updateNextInfo() { // Initializes correct values for the next month. 
+    function updateNextInfo() {
         nextMonth = (month + 1) % 12;
         nextMonthDate.setMonth(nextMonth);
         if (month == 11) {
@@ -287,67 +384,43 @@
         nextMonthDate.setDate(1);
         nextFirstDay = nextMonthDate.getDay();
         nextDaysInMonth = getDaysInMonth(nextMonthDate.getFullYear(), nextMonthDate.getMonth());
-
     }
 
-    function getDaysInMonth(year, month) { // Calculates the days in the month. 
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        return lastDay;
+    function getDaysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
     }
 
-    function getDay(dayInput) { // Updates the selected day by the user.  
-        var tempMonth = new Date();
+    function getDay(dayInput) {
+        let pressed = document.getElementById(dayInput);
+        if (!pressed || pressed.innerText.trim() === "" || pressed.disabled) return;
 
-        selectedDay = document.getElementById(dayInput).innerText;
-        selectedDay--;
+        selectedDay = Number(pressed.innerText) - 1;
         updateSelectedDay(dayInput);
-
-        let currentMonthIndex;
-        let currentMonthName;
-
-        if (viewingMonth == 0) {
-            currentMonthIndex = tempMonth.getMonth();
-        }
-
-        else if (viewingMonth == 1) {
-            currentMonthIndex = tempMonth.getMonth() + 1;
-        }
-
-        currentMonthName = monthNames[currentMonthIndex % 12];
 
         let element1 = document.getElementById("time1");
         let element2 = document.getElementById("time2");
         let element3 = document.getElementById("time3");
 
-        // Disable the buttons on timeslots that are not availible. 
-        if (adminSchedule.Schedule[viewingMonth][selectedDay][0][1] == false) {
-            element1.disabled = true;
-        }
-        else {
-            element1.disabled = false;
-        }
-        if (adminSchedule.Schedule[viewingMonth][selectedDay][1][1] == false) {
-            element2.disabled = true;
-        }
-        else {
-            element2.disabled = false;
-        }
-        if (adminSchedule.Schedule[viewingMonth][selectedDay][2][1] == false) {
-            element3.disabled = true;
-        }
-        else {
-            element3.disabled = false;
+        if (adminSchedule && adminSchedule.Schedule && adminSchedule.Schedule[viewingMonth]) {
+            const daySchedule = adminSchedule.Schedule[viewingMonth][selectedDay];
+            if (daySchedule) {
+                element1.disabled = !daySchedule[0][1];
+                element2.disabled = !daySchedule[1][1];
+                element3.disabled = !daySchedule[2][1];
+            }
         }
 
-        document.getElementById("time1").textContent = "12 PM";
-        document.getElementById("time2").textContent = "3 PM";
-        document.getElementById("time3").textContent = "6 PM";
+        element1.textContent = "12 PM";
+        element2.textContent = "3 PM";
+        element3.textContent = "6 PM";
+
+        updateSummaryDisplay();
     }
 
-    function updateSelectedDay(id) { // Highlights the date the user selected. 
+    function updateSelectedDay(id) {
         let pressed = document.getElementById(id);
         resetSelectedTime();
-        if (pressed.innerHTML.trim() !== "") {
+        if (pressed && pressed.innerHTML.trim() !== "") {
             for (let i = 0; i < 37; i++) {
                 let cell = document.getElementById(i.toString());
                 cell.setAttribute("aria-pressed", "false");
@@ -356,16 +429,17 @@
         }
     }
 
-    function resetSelected() { // Resets the calendar to the default.
+    function resetSelected() {
         selectedDay = undefined;
         for (let i = 0; i < 37; i++) {
             let cell = document.getElementById(i.toString());
             cell.setAttribute("aria-pressed", "false");
             cell.style.visibility = "visible";
         }
+        updateSummaryDisplay();
     }
 
-    function updateSelectedTime(id) { // Highlights the selected timeslot. 
+    function updateSelectedTime(id) {
         selectedTimeSlot = id - 1;
         let pressed = document.getElementById("time" + id);
         pressed.setAttribute("aria-pressed", "true");
@@ -375,30 +449,34 @@
                 btn.setAttribute("aria-pressed", "false");
             }
         }
+        updateSummaryDisplay();
     }
 
-    function resetSelectedTime() { // Resets the timeslots to default colour. 
+    function resetSelectedTime() {
         selectedTimeSlot = undefined;
         for (let i = 1; i < 4; i++) {
             let btn = document.getElementById("time" + i);
             btn.setAttribute("aria-pressed", "false");
         }
+        updateSummaryDisplay();
     }
 
-    function updateSelectedDetail(id) { // Highlights the selected detail. 
+    function updateSelectedDetail(id) {
         detailType = id - 1;
-        let pressed = document.getElementById("btn" + id);
-        pressed.setAttribute("aria-pressed", "true");
         for (let i = 1; i < 5; i++) {
-            if (i != id) {
-                document.getElementById("btn" + i).setAttribute("aria-pressed", "false");
+            const btn = document.getElementById("btn" + i);
+            if (i === id) {
+                btn.setAttribute("aria-pressed", "true");
+            } else {
+                btn.setAttribute("aria-pressed", "false");
             }
         }
+        updateSummaryDisplay();
     }
 
-    async function sendConfirmationEmail(day, month, time, detail) { // Sends a confirmation email to the user.
+    async function sendConfirmationEmail(day, month, time, detail) {
         try {
-            const response = await fetch("/send-confirmation-email", {
+            await fetch("/send-confirmation-email", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -406,34 +484,51 @@
                 },
                 body: JSON.stringify({ day, month, time, detail, _csrf: "<%= csrfToken %>" }),
             });
-
-            const result = await response.json();
-
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error sending confirmation email:", error);
         }
     }
 
-    async function book() { // Checks if all required inputs are valid for booking.
-
-        if ("<%= username %>" && selectedDay >= 0 && viewingMonth >= 0 && selectedTimeSlot >= 0 && detailType >= 0) {
+    async function book() {
+        if ("<%= username %>" && selectedDay !== undefined && selectedDay >= 0 && viewingMonth >= 0 && selectedTimeSlot !== undefined && selectedTimeSlot >= 0 && detailType !== undefined && detailType >= 0) {
             let time = document.getElementById("time" + (selectedTimeSlot + 1)).textContent;
             let detail = document.getElementById("d" + (detailType + 1)).textContent;
-            const response = await bookDatabase(selectedDay, viewingMonth, selectedTimeSlot, detailType);
-            alert("Sucesfully booked a " + detail + " detail on " + globalMonth + " " + (selectedDay + 1) + ", for " + time + ".");
-            window.location.href = "/profile";
-            sendConfirmationEmail((selectedDay + 1), globalMonth, time, detail);
+
+            await bookDatabase(selectedDay, viewingMonth, selectedTimeSlot, detailType);
+            await sendConfirmationEmail((selectedDay + 1), globalMonth, time, detail);
+
+            showCustomModal({
+                iconType: "success",
+                title: "Booking Confirmed!",
+                message: `Successfully booked a ${detail} detail on ${globalMonth} ${selectedDay + 1} for ${time}.`,
+                buttonText: "View Profile",
+                onConfirm: () => {
+                    window.location.href = "/profile";
+                }
+            });
         }
         else if (!"<%= username %>") {
-            alert("Must be logged-in first to book a detail.");
-            window.location.href = "/login";
+            showCustomModal({
+                iconType: "warning",
+                title: "Login Required",
+                message: "You must be logged in to book a car detailing service.",
+                buttonText: "Log In",
+                onConfirm: () => {
+                    window.location.href = "/login";
+                }
+            });
         }
         else {
-            alert("Select all fields before proceeding.");
+            showCustomModal({
+                iconType: "warning",
+                title: "Incomplete Selection",
+                message: "Please select a detailing package, date, and time slot before proceeding.",
+                buttonText: "Got it"
+            });
         }
     }
 
-    async function bookDatabase(selectedDay, viewingMonth, selectedTimeSlot, detailType) {  // Books a detail and stores the information in the database. 
+    async function bookDatabase(selectedDay, viewingMonth, selectedTimeSlot, detailType) {
         try {
             const response = await fetch('/book', {
                 method: 'POST',
@@ -450,23 +545,20 @@
                 }),
             });
 
-            const result = await response.json();
-
             if (response.ok) {
-                console.log(result.message);
+                const result = await response.json().catch(() => ({}));
+                console.log(result.message || "Booked successfully");
             } else {
-                console.error(result.message);
+                console.error("Booking error status:", response.status);
             }
         } catch (error) {
             console.error("Error updating admin schedule:", error);
         }
     }
-
 </script>
 
 <footer>
     <%- include('layouts/footer'); -%>
 </footer>
-
 
 </html>

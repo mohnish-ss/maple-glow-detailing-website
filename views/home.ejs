@@ -1,92 +1,242 @@
 <!DOCTYPE html>
+<html>
 <head>
     <meta name="google-site-verification" content="u2Y4CkwJm1hfKDbmA4Df4JVMlzWVWQB2uaV7kCMSwcg" />
     <%- include('layouts/navbar'); -%>
-        <title>Homepage</title>
+    <title>Maple Glow Detailing | Professional Mobile Car Detailing</title>
 </head>
 
-<!-- Image compairason slider made by "sneas", implemented from https://github.com/sneas/img-comparison-slider. -->
+<!-- Image comparison slider script -->
 <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css" />
 
 <body>
-
     <div class="fade-in-container">
 
+        <!-- Hero Section -->
         <div class="homepage-background-image">
             <div class="hero-content">
                 <h1 class="homepage-title">Maple Glow Detailing</h1>
                 <p class="hero-subtitle">
                     Mobile car detailing for cleaner cabins, brighter paint, and headlights that look sharp again.
                 </p>
-                <div class="hero-action">
+                <div class="hero-action" style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
                     <% if (username) { %>
-                        <a href="/booking"><button class="book-button" type="button">Book now</button></a>
+                        <a href="/booking"><button class="book-button" type="button">Book appointment</button></a>
                     <% } else { %>
-                        <a href="/login"><button class="book-button" type="button">Book now</button></a>
+                        <a href="/login"><button class="book-button" type="button">Book appointment</button></a>
                     <% } %>
+                    <a href="/estimate" class="ai-estimate-hero-btn">
+                        Get AI Estimate
+                    </a>
                 </div>
             </div>
         </div>
 
+        <!-- Service Stats Section -->
         <section class="service-strip" aria-label="Maple Glow service highlights">
             <div class="service-stat">
                 <span>01</span>
                 <strong>Interior refresh</strong>
-                <p>Vacuuming, wipe-downs, and careful cabin cleaning.</p>
+                <p>Deep vacuuming, stain treatment, wipe-downs, and careful cabin cleaning.</p>
             </div>
             <div class="service-stat">
                 <span>02</span>
                 <strong>Exterior care</strong>
-                <p>Wash, shine, and finish work for a cleaner vehicle.</p>
+                <p>Gentle hand wash, premium wax finish, and wheel cleaning for a bright shine.</p>
             </div>
             <div class="service-stat">
                 <span>03</span>
                 <strong>Simple booking</strong>
-                <p>Choose your package, date, and time in one flow.</p>
+                <p>Pick your package, choose your preferred date and time in under two minutes.</p>
             </div>
         </section>
 
-        <div class="slider-section">
-            <h1 class="slider-title title">Before & After</h1>
-            
-            <div class="homepage-comparison-slider">
-                <img-comparison-slider class="slider-color slider-focus" value="72">
-                    <img slot="first" class="slider-image" src="images/headlight_before.png">
-                    <img slot="second" class="slider-image" src="images/headlight_after.png">
-                    <svg slot="handle" xmlns="http://www.w3.org/2000/svg" width="100" viewBox="-8 -3 16 6">
-                        <path stroke="#0071e3" d="M -5 -2 L -7 0 L -5 2 M -5 -2 L -5 2 M 5 -2 L 7 0 L 5 2 M 5 -2 L 5 2"
-                            stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"></path>
-                    </svg>
-                </img-comparison-slider>
+        <!-- Features Showcase Section -->
+        <section style="max-width: 1120px; margin: 3rem auto 4rem; padding: 0 var(--page-gutter);">
+            <div style="text-align: center; margin-bottom: 2.5rem;">
+                <h2 class="title" style="margin-bottom: 0.5rem;">Why Choose Maple Glow?</h2>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem;">
+                    We bring professional car detailing directly to your driveway or workplace.
+                </p>
+            </div>
 
-                <img-comparison-slider class="slider-color slider-focus" value="52.5">
-                    <img slot="first" class="slider-image" src="images/wheel-before.png">
-                    <img slot="second" class="slider-image" src="images/wheel-after.png">
-                    <svg slot="handle" xmlns="http://www.w3.org/2000/svg" width="100" viewBox="-8 -3 16 6">
-                        <path stroke="#0071e3" d="M -5 -2 L -7 0 L -5 2 M -5 -2 L -5 2 M 5 -2 L 7 0 L 5 2 M 5 -2 L 5 2"
-                            stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"></path>
-                    </svg>
-                </img-comparison-slider>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <div class="feature-card">
+                    <div class="feature-icon-circle">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+                            <path d="M15 18H9"></path>
+                            <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.24-4.04a1 1 0 0 0-.78-.34H15"></path>
+                            <circle cx="7" cy="18" r="2"></circle>
+                            <circle cx="17" cy="18" r="2"></circle>
+                        </svg>
+                    </div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.2rem; color: var(--text-primary);">Mobile Service</h3>
+                    <p style="margin: 0; color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">
+                        No long waiting rooms. We arrive fully equipped at your home or workplace at your scheduled time.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-circle">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.2rem; color: var(--text-primary);">AI Estimates</h3>
+                    <p style="margin: 0; color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">
+                        Snap a photo of your car and get an instant AI vehicle classification with upfront pricing.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-circle">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.2rem; color: var(--text-primary);">Quality Guaranteed</h3>
+                    <p style="margin: 0; color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem;">
+                        Meticulous attention to detail on every vehicle using premium, eco-friendly cleaning formulas.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before & After Comparison Slider Section -->
+        <div class="slider-section" style="max-width: 1120px; margin: 0 auto; padding: 2rem var(--page-gutter) 5rem;">
+            <div style="text-align: center; margin-bottom: 2.5rem;">
+                <h2 class="slider-title title" style="margin-bottom: 0.5rem;">Real Results</h2>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem;">
+                    Slide horizontally to see the dramatic before-and-after transformations delivered by our detailing specialists.
+                </p>
+            </div>
+
+            <div class="homepage-comparison-slider" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; align-items: stretch; padding: 0;">
+                
+                <!-- Result Card 1: Headlight Restoration -->
+                <div class="real-result-card" style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; height: 100%; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem;">
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary); font-weight: 700;">Headlight Restoration</h3>
+                        <span style="font-size: 0.75rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: var(--radius-pill);">Oxidation Removal</span>
+                    </div>
+
+                    <div class="slider-wrapper" style="position: relative; width: 100%; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); flex: 1; display: flex; align-items: center;">
+                        <!-- Clickable Before / After Buttons -->
+                        <button type="button" class="before-after-btn before-btn" onclick="setSliderValue('slider1', 3, this)" style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.65); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-pill); backdrop-filter: blur(6px); cursor: pointer; transition: all var(--transition);">Before</button>
+                        <button type="button" class="before-after-btn after-btn" onclick="setSliderValue('slider1', 97, this)" style="position: absolute; top: 12px; right: 12px; z-index: 20; background: var(--primary); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-pill); backdrop-filter: blur(6px); cursor: pointer; transition: all var(--transition);">After</button>
+
+                        <img-comparison-slider id="slider1" class="slider-color slider-focus" value="72" style="width: 100%; display: block;">
+                            <img slot="first" class="slider-image" src="images/headlight_before.png" alt="Headlight Before Restoration" style="width: 100%; max-height: 360px; object-fit: cover; border-radius: 0;">
+                            <img slot="second" class="slider-image" src="images/headlight_after.png" alt="Headlight After Restoration" style="width: 100%; max-height: 360px; object-fit: cover; border-radius: 0;">
+                            <svg slot="handle" xmlns="http://www.w3.org/2000/svg" width="80" viewBox="-8 -3 16 6">
+                                <path stroke="#0071e3" d="M -5 -2 L -7 0 L -5 2 M -5 -2 L -5 2 M 5 -2 L 7 0 L 5 2 M 5 -2 L 5 2" stroke-width="1.8" fill="none" vector-effect="non-scaling-stroke"></path>
+                            </svg>
+                        </img-comparison-slider>
+                    </div>
+                </div>
+
+                <!-- Result Card 2: Wheel & Rim Deep Clean -->
+                <div class="real-result-card" style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; height: 100%; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem;">
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary); font-weight: 700;">Wheel & Rim Deep Clean</h3>
+                        <span style="font-size: 0.75rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: var(--radius-pill);">Brake Dust Decon</span>
+                    </div>
+
+                    <div class="slider-wrapper" style="position: relative; width: 100%; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); flex: 1; display: flex; align-items: center;">
+                        <!-- Clickable Before / After Buttons -->
+                        <button type="button" class="before-after-btn before-btn" onclick="setSliderValue('slider2', 3, this)" style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.65); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-pill); backdrop-filter: blur(6px); cursor: pointer; transition: all var(--transition);">Before</button>
+                        <button type="button" class="before-after-btn after-btn" onclick="setSliderValue('slider2', 97, this)" style="position: absolute; top: 12px; right: 12px; z-index: 20; background: var(--primary); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-pill); backdrop-filter: blur(6px); cursor: pointer; transition: all var(--transition);">After</button>
+
+                        <img-comparison-slider id="slider2" class="slider-color slider-focus" value="52.5" style="width: 100%; display: block;">
+                            <img slot="first" class="slider-image" src="images/wheel-before.png" alt="Wheel Before Detail" style="width: 100%; max-height: 360px; object-fit: cover; border-radius: 0;">
+                            <img slot="second" class="slider-image" src="images/wheel-after.png" alt="Wheel After Detail" style="width: 100%; max-height: 360px; object-fit: cover; border-radius: 0;">
+                            <svg slot="handle" xmlns="http://www.w3.org/2000/svg" width="80" viewBox="-8 -3 16 6">
+                                <path stroke="#0071e3" d="M -5 -2 L -7 0 L -5 2 M -5 -2 L -5 2 M 5 -2 L 5 2 M 5 -2 L 5 2" stroke-width="1.8" fill="none" vector-effect="non-scaling-stroke"></path>
+                            </svg>
+                        </img-comparison-slider>
+                    </div>
+                </div>
+
             </div>
         </div>
 
     </div>
-
 </body>
 
-<style>
-    /* "@media" is used to ensure the elements on the page resize properly within the user's screen size. */
-    @media (max-width: 1294px) {
-        .homepage-comparison-slider {
-            flex-direction: column;
-            align-items: center;
+<script>
+    const activeSliderAnimations = {};
+
+    document.addEventListener("DOMContentLoaded", () => {
+        ['slider1', 'slider2'].forEach(id => {
+            const slider = document.getElementById(id);
+            if (slider) {
+                slider.dataset.initialVal = slider.getAttribute("value") || 50;
+            }
+        });
+    });
+
+    function animateSliderTo(sliderId, startVal, targetVal, duration) {
+        const slider = document.getElementById(sliderId);
+        if (!slider) return;
+
+        if (activeSliderAnimations[sliderId]) {
+            cancelAnimationFrame(activeSliderAnimations[sliderId]);
+        }
+
+        const startTime = performance.now();
+        
+        function step(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Cubic ease-in-out curve for smooth, silky transition
+            const easeProgress = progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+            slider.value = startVal + (targetVal - startVal) * easeProgress;
+
+            if (progress < 1) {
+                activeSliderAnimations[sliderId] = requestAnimationFrame(step);
+            } else {
+                delete activeSliderAnimations[sliderId];
+            }
+        }
+
+        activeSliderAnimations[sliderId] = requestAnimationFrame(step);
+    }
+
+    function setSliderValue(sliderId, targetValue, btnEl) {
+        const slider = document.getElementById(sliderId);
+        if (!slider) return;
+
+        if (!slider.dataset.initialVal) {
+            slider.dataset.initialVal = slider.getAttribute("value") || 50;
+        }
+        const initialVal = parseFloat(slider.dataset.initialVal);
+        const currentVal = parseFloat(slider.value) || 50;
+
+        // If already at target value (e.g. at 0 for BEFORE or 100 for AFTER), reset back to original position
+        let finalTarget = targetValue;
+        if (Math.abs(currentVal - targetValue) < 8) {
+            finalTarget = initialVal;
+        }
+
+        animateSliderTo(sliderId, currentVal, finalTarget, 650);
+
+        if (btnEl) {
+            btnEl.style.transform = 'scale(0.92)';
+            setTimeout(() => {
+                btnEl.style.transform = 'scale(1)';
+            }, 180);
         }
     }
-</style>
+</script>
 
 <footer>
     <%- include('layouts/footer'); -%>
 </footer>
-
 </html>

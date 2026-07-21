@@ -1,311 +1,319 @@
 <!DOCTYPE html>
+<html>
 
 <head>
     <%- include('layouts/navbar'); -%>
-        <title>Profile</title>
+    <title>Profile | Maple Glow</title>
 </head>
 
 <body>
+    <div class="fade-in-container" style="max-width: 960px; margin: 0 auto; padding: 2rem var(--page-gutter) 5rem;">
 
-    <h1 class="slide-in-left fade-first title">Welcome, <%= userData.firstName %>!</h1>
-
-    <div class="profile-container">
-
-        <div class="fade-after minimal-card" style="width: 100%; max-width: 600px; margin: 0 auto;">
-            <h2 class="personal-information-title" style="margin-top: 0;">Personal information</h2>
-
-            <!-- Visible information form. -->
-            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
-                <div>
-                    <label class="profile-label" for="firstName">First name</label>
-                    <input class="input-box" type="text" id="firstName" name="firstName" disabled style="width: 100%; box-sizing: border-box;">
+        <!-- Profile Header -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2rem 2rem 1.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1.25rem;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--primary); color: #fff; font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase;">
+                        <%= (userData.firstName ? userData.firstName.charAt(0) : 'U') + (userData.lastName ? userData.lastName.charAt(0) : '') %>
+                    </div>
+                    <div>
+                        <h1 style="margin: 0 0 0.2rem; font-size: 1.5rem; font-weight: 800; color: var(--text-primary);">Welcome back, <%= userData.firstName %>!</h1>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span style="font-weight: 700; color: var(--primary);">@<%= userData.userName || userData.username %></span>
+                            <span style="margin: 0 6px; color: var(--border);">•</span>
+                            <%= userData.email %>
+                        </p>
+                    </div>
                 </div>
-                
-                <div>
-                    <label class="profile-label" for="lastName">Last name</label>
-                    <input class="input-box" type="text" id="lastName" name="lastName" disabled style="width: 100%; box-sizing: border-box;">
+                <a href="/logout" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: var(--radius-pill); border: 1px solid var(--border); color: var(--text-secondary); font-weight: 600; text-decoration: none; font-size: 0.88rem; transition: all var(--transition);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Log Out
+                </a>
+            </div>
+            <!-- Quick stats strip -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; padding-top: 1.25rem; border-top: 1px solid var(--border-light);">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span><strong style="color: var(--text-primary);"><%= userData.firstName %> <%= userData.lastName %></strong></span>
                 </div>
-
-                <div>
-                    <label class="profile-label" for="email">Email</label>
-                    <input class="input-box" type="text" id="email" name="email" disabled style="width: 100%; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.83-.83a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"></path></svg>
+                    <span><%= userData.phoneNum || 'No phone added' %></span>
                 </div>
-
-                <div>
-                    <label class="profile-label" for="phoneNumber">Phone number</label>
-                    <input class="input-box" type="text" id="phoneNumber" name="phoneNumber" disabled style="width: 100%; box-sizing: border-box;">
-                </div>
-
-                <div>
-                    <label class="profile-label" for="address">Address</label>
-                    <input class="input-box" type="text" id="address" name="address" disabled style="width: 100%; box-sizing: border-box;">
-                </div>
-
-                <div>
-                    <label class="profile-label" for="postalCode">Postal code</label>
-                    <input class="input-box" type="text" id="postalCode" name="postalCode" disabled style="width: 100%; box-sizing: border-box;">
-                </div>
-
-                <div>
-                    <label class="profile-label" for="username">Username</label>
-                    <input class="input-box" type="text" id="username" name="username" disabled style="width: 100%; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span><%= userData.adr || 'No address added' %></span>
                 </div>
             </div>
+        </div>
 
-            <div class="button-block">
-                <button id="editButton" class="profile-page-buttons" onclick="edit()">Edit</button>
-                <!-- Hidden information form with "Save" button. -->
-                <form action="/save-form" method="post" onsubmit="return checkFields()">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+
+            <!-- Personal Information Form Card -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+                    <div>
+                        <h2 style="margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">Personal Information</h2>
+                        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Update your name, contact details, and address.</p>
+                    </div>
+                    <button type="button" id="editButton" onclick="toggleEditMode()" class="profile-page-buttons" style="padding: 7px 16px; font-size: 0.85rem; background-color: var(--primary); color: #ffffff; display: inline-flex; align-items: center; gap: 5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Edit Profile
+                    </button>
+                </div>
+
+                <form id="profileDetailsForm" action="/save-form" method="post" onsubmit="return handleProfileSave(event)">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button id="saveButton" class="save-button-disabled" onclick="save()" disabled>Save</button>
-                    <input type="text" id="firstNameHidden" name="firstName" hidden><br>
-                    <input type="text" id="lastNameHidden" name="lastName" hidden><br>
-                    <input type="text" id="emailHidden" name="email" hidden><br>
-                    <input type="text" id="phoneNumberHidden" name="phoneNumber" hidden><br>
-                    <input type="text" id="addressHidden" name="address" hidden><br>
-                    <input type="text" id="postalCodeHidden" name="postalCode" hidden><br>
-                    <input type="text" id="usernameHidden" name="username" hidden><br>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label class="profile-label" for="firstName">First Name</label>
+                            <input class="input-box profile-input-field" type="text" id="firstName" name="firstName" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label class="profile-label" for="lastName">Last Name</label>
+                            <input class="input-box profile-input-field" type="text" id="lastName" name="lastName" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label class="profile-label" for="email">Email Address</label>
+                            <input class="input-box profile-input-field" type="email" id="email" name="email" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label class="profile-label" for="phoneNumber">Phone Number</label>
+                            <input class="input-box profile-input-field" type="tel" id="phoneNumber" name="phoneNumber" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label class="profile-label" for="address">Address</label>
+                            <input class="input-box profile-input-field" type="text" id="address" name="address" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label class="profile-label" for="postalCode">Postal Code</label>
+                            <input class="input-box profile-input-field" type="text" id="postalCode" name="postalCode" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label class="profile-label" for="username">Username</label>
+                            <input class="input-box profile-input-field" type="text" id="username" name="username" disabled required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div id="editActionControls" class="edit-action-controls" aria-hidden="true">
+                        <button type="button" onclick="cancelEdit()" class="profile-page-buttons" style="background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border);">Cancel</button>
+                        <button type="submit" id="saveButton" class="profile-page-buttons" style="background-color: var(--primary); color: #ffffff; display: inline-flex; align-items: center; gap: 5px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Save Changes
+                        </button>
+                    </div>
                 </form>
             </div>
 
-            <!-- Password Change Section -->
-            <div class="password-change-section" style="margin-top: 2rem;">
-                <h2 class="personal-information-title">Change Password</h2>
-                <form id="passwordChangeForm" onsubmit="return changePassword(event)" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div>
-                        <label class="profile-label" for="currentPassword">Current Password</label>
-                        <div class="password-block" style="position: relative;">
-                            <input class="input-box" type="password" id="currentPassword" name="currentPassword" required style="width: 100%; box-sizing: border-box;">
-                            <button type="button" class="password-vis-icon" onclick="toggleCurrentPass()">
-                                <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
-                            </button>
+            <!-- Security Card -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+                    <h2 style="margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">Security & Password</h2>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Update your password to keep your account secure.</p>
+                </div>
+
+                <form id="passwordChangeForm" onsubmit="return changePassword(event)">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem;">
+                        <div>
+                            <label class="profile-label" for="currentPassword">Current Password</label>
+                            <div style="position: relative;">
+                                <input class="input-box" type="password" id="currentPassword" name="currentPassword" required style="width: 100%; box-sizing: border-box; padding-right: 44px;">
+                                <button type="button" class="password-toggle" onclick="togglePassVisibility('currentPassword', this)" aria-label="Toggle password visibility">
+                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                    <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="profile-label" for="newPassword">New Password</label>
+                            <div style="position: relative;">
+                                <input class="input-box" type="password" id="newPassword" name="newPassword" required style="width: 100%; box-sizing: border-box; padding-right: 44px;">
+                                <button type="button" class="password-toggle" onclick="togglePassVisibility('newPassword', this)" aria-label="Toggle password visibility">
+                                    <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                    <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; display: block;">At least 8 chars with uppercase, lowercase, number &amp; special character.</span>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="profile-label" for="newPassword">New Password</label>
-                        <div class="password-block" style="position: relative;">
-                            <input class="input-box" type="password" id="newPassword" name="newPassword" required style="width: 100%; box-sizing: border-box;">
-                            <button type="button" class="password-vis-icon" onclick="toggleNewPass()">
-                                <img src="https://cdn-icons-png.flaticon.com/512/2355/2355322.png">
-                            </button>
-                        </div>
-                    </div>
+                    <div id="passwordChangeMessage" style="display: none; padding: 11px 15px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 600; margin-top: 1.1rem;"></div>
 
-                    <button type="submit" class="profile-page-buttons" style="margin-top: 1rem;">Change Password</button>
+                    <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="profile-page-buttons" style="background-color: var(--primary); color: #ffffff; height: 38px; padding: 0 20px; display: inline-flex; align-items: center; gap: 5px; font-size: 0.88rem;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Update Password
+                        </button>
+                    </div>
                 </form>
-                <div id="passwordChangeMessage" class="message"></div>
+            </div>
+
+            <!-- Upcoming Bookings Card -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+                    <div>
+                        <h2 style="margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">Upcoming Bookings</h2>
+                        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Your scheduled detailing appointments.</p>
+                    </div>
+                    <a href="/booking" style="display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: var(--radius-pill); background: var(--primary-light); color: var(--primary); font-weight: 700; text-decoration: none; font-size: 0.82rem; transition: all var(--transition);">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Book New
+                    </a>
+                </div>
+                <div id="bookingsList">
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.9rem; padding: 0.5rem 0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                        Loading bookings...
+                    </div>
+                </div>
             </div>
 
         </div>
 
     </div>
-
 </body>
 
+<style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .booking-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-light);
+        background: var(--bg);
+        transition: border-color 0.2s ease;
+    }
+    .booking-row:hover { border-color: var(--primary); }
+    .booking-row + .booking-row { margin-top: 0.6rem; }
+    .booking-date-badge {
+        min-width: 52px;
+        text-align: center;
+        background: var(--primary-light);
+        border-radius: var(--radius-sm);
+        padding: 6px 8px;
+        flex-shrink: 0;
+    }
+    .booking-date-badge .bday { font-size: 1.3rem; font-weight: 800; color: var(--primary); line-height: 1; }
+    .booking-date-badge .bmon { font-size: 0.65rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .edit-action-controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        max-height: 0;
+        padding-top: 0;
+        border-top: 1px solid transparent;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: max-height 0.35s ease, padding-top 0.35s ease, border-color 0.35s ease,
+            opacity 0.25s ease, transform 0.35s ease;
+    }
+    .edit-action-controls.is-visible {
+        max-height: 80px;
+        padding-top: 1rem;
+        border-top-color: var(--border-light);
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+    .profile-input-field {
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+</style>
+
 <script>
-    //Variable to control whether or not the boxes are editable or not.
-    let editMode;
+    const initialProfileData = <%- json(userData) %>;
 
-    //Variables for the visible input boxes in the profile page.
-    let firstName = document.getElementById("firstName");
-    let lastName = document.getElementById("lastName");
-    let email = document.getElementById("email");
-    let phoneNumber = document.getElementById("phoneNumber");
-    let address = document.getElementById("address");
-    let postalCode = document.getElementById("postalCode");
-    let username = document.getElementById("username");
+    const fields = ['firstName', 'lastName', 'email', 'phoneNumber', 'address', 'postalCode', 'username'];
+    let isEditMode = false;
 
-    //Default background color for the input boxes.
-    firstName.style.backgroundColor = '#e7e7e7';
-    lastName.style.backgroundColor = '#e7e7e7';
-    email.style.backgroundColor = '#e7e7e7';
-    phoneNumber.style.backgroundColor = '#e7e7e7';
-    address.style.backgroundColor = '#e7e7e7';
-    postalCode.style.backgroundColor = '#e7e7e7';
-    username.style.backgroundColor = '#e7e7e7';
+    // Populate initial form data
+    function populateForm() {
+        document.getElementById("firstName").value = initialProfileData.firstName || "";
+        document.getElementById("lastName").value = initialProfileData.lastName || "";
+        document.getElementById("email").value = initialProfileData.email || "";
+        document.getElementById("phoneNumber").value = initialProfileData.phoneNum || "";
+        document.getElementById("address").value = initialProfileData.adr || "";
+        document.getElementById("postalCode").value = initialProfileData.pCode || "";
+        document.getElementById("username").value = initialProfileData.userName || "";
+    }
 
-    //Error trapping functions to ensure user updates their information while conforming to certain standards.
-    function checkPass(pass) {
-        if (pass.length < 8) {
-            return false;
+    populateForm();
+
+    function toggleEditMode() {
+        if (isEditMode) {
+            cancelEdit();
+        } else {
+            enableEdit();
         }
+    }
 
-        let upper = false;
-        let lower = false;
-        let digit = false;
-        let special = false;
+    function enableEdit() {
+        isEditMode = true;
+        const form = document.getElementById("profileDetailsForm");
+        fields.forEach(id => {
+            const input = document.getElementById(id);
+            input.removeAttribute("disabled");
+            input.style.backgroundColor = "#ffffff";
+            input.style.borderColor = "var(--primary)";
+        });
+        document.getElementById("editButton").textContent = "Cancel";
+        form.classList.add("is-editing");
+        const controls = document.getElementById("editActionControls");
+        controls.classList.add("is-visible");
+        controls.setAttribute("aria-hidden", "false");
+    }
 
+    function cancelEdit() {
+        isEditMode = false;
+        const form = document.getElementById("profileDetailsForm");
+        populateForm();
+        fields.forEach(id => {
+            const input = document.getElementById(id);
+            input.setAttribute("disabled", true);
+            input.style.backgroundColor = "var(--bg-card)";
+            input.style.borderColor = "var(--border-light)";
+        });
+        document.getElementById("editButton").textContent = "Edit Profile";
+        form.classList.remove("is-editing");
+        const controls = document.getElementById("editActionControls");
+        controls.classList.remove("is-visible");
+        controls.setAttribute("aria-hidden", "true");
+    }
+
+    function handleProfileSave(event) {
+        // Enable fields so form POST data includes all values
+        fields.forEach(id => {
+            document.getElementById(id).removeAttribute("disabled");
+        });
+        return true;
+    }
+
+    function checkPass(pass) {
+        if (pass.length < 8) return false;
+        let upper = false, lower = false, digit = false, special = false;
         for (let i = 0; i < pass.length; i++) {
-            if (pass.charAt(i) >= "A" && pass.charAt(i) <= "Z") {
-                upper = true;
-            } else if (pass.charAt(i) >= "a" && pass.charAt(i) <= "z") {
-                lower = true;
-            } else if (pass.charAt(i) >= "0" && pass.charAt(i) <= "9") {
-                digit = true;
-            } else if ("@$!%*?&_".includes(pass.charAt(i))) {
-                special = true;
-            }
+            const char = pass.charAt(i);
+            if (char >= "A" && char <= "Z") upper = true;
+            else if (char >= "a" && char <= "z") lower = true;
+            else if (char >= "0" && char <= "9") digit = true;
+            else if ("@$!%*?&_#^()[]{}".includes(char)) special = true;
         }
         return upper && lower && digit && special;
     }
 
-    function checkFields() {
-        const emailValue = email.value;
-        if (
-            emailValue.includes("@gmail.com") ||
-            emailValue.includes("@yahoo.com") ||
-            emailValue.includes("@outlook.com") ||
-            emailValue.includes("@icloud.com")
-        ) {
-            disableInputs();
-            return true;
-        }
-        alert("Invalid e-mail address");
-        enableInputs();
-        return false;
-    }
-
-    //"edit()" function controls whether or not the input boxes are disabled or not. This function is called when the "Edit" button is pressed.
-    function edit() {
-        const editButton = document.getElementById("editButton");
-        const saveButton = document.getElementById("saveButton");
-
-        if (firstName.disabled) {
-            editButton.textContent = "Cancel";
-            enableInputs();
-            saveButton.removeAttribute("disabled");
-            saveButton.classList.add("profile-page-buttons");
-            saveButton.classList.remove("save-button-disabled");
+    function togglePassVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            btn.classList.add("show-password");
         } else {
-            editButton.textContent = "Edit";
-            disableInputs();
-            saveButton.setAttribute("disabled", true);
-            saveButton.classList.add("save-button-disabled");
-            saveButton.classList.remove("profile-page-buttons");
-        }
-    }
-
-    //"enableInputs()" and "disableInputs()" change the styles of the input boxes so that they are either enabled or disabled based on the edit status.
-    function enableInputs() {
-        firstName.removeAttribute("disabled");
-        lastName.removeAttribute("disabled");
-        email.removeAttribute("disabled");
-        phoneNumber.removeAttribute("disabled");
-        address.removeAttribute("disabled");
-        postalCode.removeAttribute("disabled");
-        username.removeAttribute("disabled");
-
-        firstName.style.backgroundColor = 'white';
-        lastName.style.backgroundColor = 'white';
-        email.style.backgroundColor = 'white';
-        phoneNumber.style.backgroundColor = 'white';
-        address.style.backgroundColor = 'white';
-        postalCode.style.backgroundColor = 'white';
-        username.style.backgroundColor = 'white';
-    }
-
-    function disableInputs() {
-        firstName.setAttribute("disabled", true);
-        lastName.setAttribute("disabled", true);
-        email.setAttribute("disabled", true);
-        phoneNumber.setAttribute("disabled", true);
-        address.setAttribute("disabled", true);
-        postalCode.setAttribute("disabled", true);
-        username.setAttribute("disabled", true);
-
-        firstName.style.backgroundColor = '#e7e7e7';
-        lastName.style.backgroundColor = '#e7e7e7';
-        email.style.backgroundColor = '#e7e7e7';
-        phoneNumber.style.backgroundColor = '#e7e7e7';
-        address.style.backgroundColor = '#e7e7e7';
-        postalCode.style.backgroundColor = '#e7e7e7';
-        username.style.backgroundColor = '#e7e7e7';
-    }
-
-    //Saves the edits to the database.
-    function save() {
-        updateDisplayedInfo();
-
-        document.getElementById("usernameHidden").value = username.value;
-        document.getElementById("firstNameHidden").value = firstName.value;
-        document.getElementById("lastNameHidden").value = lastName.value;
-        document.getElementById("emailHidden").value = email.value;
-        document.getElementById("phoneNumberHidden").value = phoneNumber.value;
-        document.getElementById("addressHidden").value = address.value;
-        document.getElementById("postalCodeHidden").value = postalCode.value;
-
-        document.forms.submit();
-    }
-
-    //Updates the edits on the profile page after they are submitted.
-    function updateDisplayedInfo() {
-        const newName = firstName.value;
-        const newLastName = lastName.value;
-        const newEmail = email.value;
-        const newPhoneNumber = phoneNumber.value;
-        const newAddress = address.value;
-        const newPostalCode = postalCode.value;
-        const newUsername = username.value;
-
-        firstName.value = newName;
-        lastName.value = newLastName;
-        email.value = newEmail;
-        phoneNumber.value = newPhoneNumber;
-        address.value = newAddress;
-        postalCode.value = newPostalCode;
-        username.value = newUsername;
-
-        disableInputs();
-    }
-
-    //Visible form on the profile page, pulls information from the session varaible "userData".
-    const profileData = <%- json(userData) %>;
-    firstName.value = profileData.firstName || "";
-    lastName.value = profileData.lastName || "";
-    email.value = profileData.email || "";
-    phoneNumber.value = profileData.phoneNum || "";
-    address.value = profileData.adr || "";
-    postalCode.value = profileData.pCode || "";
-    username.value = profileData.userName || "";
-
-    //Hidden form on the profile page so that edits can be saved to the database, and then updated on the visible form afterwards.
-    document.getElementById("usernameHidden").value = username.value;
-    document.getElementById("firstNameHidden").value = firstName.value;
-    document.getElementById("lastNameHidden").value = lastName.value;
-    document.getElementById("emailHidden").value = email.value;
-    document.getElementById("phoneNumberHidden").value = phoneNumber.value;
-    document.getElementById("addressHidden").value = address.value;
-    document.getElementById("postalCodeHidden").value = postalCode.value;
-
-    // Add these new functions for password change
-    function toggleCurrentPass() {
-        const pass = document.getElementById("currentPassword");
-        const eyeIcon = pass.nextElementSibling.querySelector("img");
-
-        if (pass.type === "password") {
-            pass.type = "text";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png";
-            eyeIcon.style.opacity = 1;
-        } else {
-            pass.type = "password";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2355/2355322.png";
-            eyeIcon.style.opacity = 0.7;
-        }
-    }
-
-    function toggleNewPass() {
-        const pass = document.getElementById("newPassword");
-        const eyeIcon = pass.nextElementSibling.querySelector("img");
-
-        if (pass.type === "password") {
-            pass.type = "text";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png";
-            eyeIcon.style.opacity = 1;
-        } else {
-            pass.type = "password";
-            eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2355/2355322.png";
-            eyeIcon.style.opacity = 0.7;
+            input.type = "password";
+            btn.classList.remove("show-password");
         }
     }
 
@@ -317,9 +325,10 @@
         const messageDiv = document.getElementById("passwordChangeMessage");
 
         if (!checkPass(newPassword)) {
-            messageDiv.textContent = "Invalid password: must have 8 characters, one uppercase, one lowercase, and one special character";
+            messageDiv.textContent = "Invalid password: Must be at least 8 characters with upper, lower, number, and special character.";
             messageDiv.style.display = "block";
-            messageDiv.style.color = "red";
+            messageDiv.style.backgroundColor = "#ffebe9";
+            messageDiv.style.color = "#d73a49";
             return false;
         }
 
@@ -340,21 +349,81 @@
 
             messageDiv.textContent = data.message;
             messageDiv.style.display = "block";
-            messageDiv.style.color = data.success ? "green" : "red";
-
             if (data.success) {
+                messageDiv.style.backgroundColor = "#dcffe4";
+                messageDiv.style.color = "#1a7f37";
                 document.getElementById("passwordChangeForm").reset();
+            } else {
+                messageDiv.style.backgroundColor = "#ffebe9";
+                messageDiv.style.color = "#d73a49";
             }
         } catch (error) {
             console.error('Error:', error);
-            messageDiv.textContent = "An error occurred while changing password";
+            messageDiv.textContent = "An error occurred while changing password.";
             messageDiv.style.display = "block";
-            messageDiv.style.color = "red";
+            messageDiv.style.backgroundColor = "#ffebe9";
+            messageDiv.style.color = "#d73a49";
         }
 
         return false;
     }
 
+    // Load upcoming bookings
+    async function loadBookings() {
+        const list = document.getElementById('bookingsList');
+        try {
+            const res = await fetch('/my-bookings', {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) {
+                throw new Error(`Bookings request failed: ${res.status}`);
+            }
+            const bookings = await res.json();
+            if (!Array.isArray(bookings)) {
+                throw new Error('Bookings response was not an array');
+            }
+            if (!bookings.length) {
+                list.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 2rem 0; color: var(--text-muted); text-align: center;">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span style="font-size:0.95rem; font-weight:600; color:var(--text-secondary);">No upcoming bookings</span>
+                        <span style="font-size:0.82rem;">Ready for a detail? <a href="/booking" style="color:var(--primary); font-weight:700; text-decoration:none;">Book now →</a></span>
+                    </div>`;
+                return;
+            }
+
+            const serviceIcons = {
+                'Interior': '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>',
+                'Exterior': '<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.24-4.04a1 1 0 0 0-.78-.34H15"></path><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle>',
+                'Full Package': '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+                'Headlight Polish': '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>'
+            };
+
+            list.innerHTML = bookings.map(b => `
+                <div class="booking-row">
+                    <div class="booking-date-badge">
+                        <div class="bday">${b.day}</div>
+                        <div class="bmon">${b.month.slice(0,3)}</div>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">${b.service}</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:2px;">${b.month} ${b.day} &nbsp;·&nbsp; ${b.time}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:var(--primary-light);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${serviceIcons[b.service] || ''}</svg>
+                        </div>
+                        <span style="font-size:0.75rem; font-weight:700; color:#1a7f37; background:#dcffe4; padding:3px 10px; border-radius:999px;">Confirmed</span>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">Could not load bookings.</p>`;
+        }
+    }
+
+    loadBookings();
 </script>
 
 <footer>

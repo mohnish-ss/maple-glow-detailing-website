@@ -568,6 +568,7 @@ app.post("/check-login", loginLimiter, validateLogin, async (req, res) => {
     });
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.json({
       success: false,
       message: 'An error occurred during login'
@@ -639,6 +640,66 @@ app.get("/profile", (req, res) => {
     userData: req.session.userData,
     csrfToken: res.locals.csrfToken
   });
+});
+
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const TIME_NAMES = ["12 PM", "3 PM", "6 PM"];
+const DETAIL_NAMES = ["Interior", "Exterior", "Full Package", "Headlight Polish"];
+
+app.get("/my-bookings", requireAuth, async (req, res) => {
+  try {
+    const username = normalizeUsername(req.session.username);
+    const adminScheduleCollection = db.collection("adminSchedule");
+    // Older schedule documents may not have the legacy id1 marker.
+    const doc = await adminScheduleCollection.findOne({ id1: "hello" })
+      || await adminScheduleCollection.findOne({ Schedule: { $exists: true } });
+    if (!doc || !Array.isArray(doc.Schedule)) return res.json([]);
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentDay = now.getDate() - 1; // 0-indexed
+
+    const userBookings = [];
+    const schedule = doc.Schedule;
+
+    // Schedule is indexed 0 = current month, 1 = next month
+    for (let monthIdx = 0; monthIdx < schedule.length; monthIdx++) {
+      const monthData = schedule[monthIdx];
+      if (!monthData) continue;
+      for (let dayIdx = 0; dayIdx < monthData.length; dayIdx++) {
+        const daySlots = monthData[dayIdx];
+        if (!daySlots) continue;
+        for (let timeIdx = 0; timeIdx < daySlots.length; timeIdx++) {
+          const slot = daySlots[timeIdx];
+          // slot: [label, isAvailable, detailType, username]
+          if (slot && normalizeUsername(slot[3]) === username && slot[1] === false) {
+            const realMonth = (currentMonth + monthIdx) % 12;
+            const dayNum = dayIdx + 1;
+            // Skip past dates
+            if (monthIdx === 0 && dayIdx < currentDay) continue;
+            userBookings.push({
+              month: MONTH_NAMES[realMonth],
+              day: dayNum,
+              time: TIME_NAMES[timeIdx] || slot[0],
+              service: DETAIL_NAMES[slot[2]] || "Unknown"
+            });
+          }
+        }
+      }
+    }
+
+    // Sort chronologically
+    userBookings.sort((a, b) => {
+      const aDate = new Date(`${a.month} ${a.day}, ${now.getFullYear()}`);
+      const bDate = new Date(`${b.month} ${b.day}, ${now.getFullYear()}`);
+      return aDate - bDate;
+    });
+
+    res.json(userBookings);
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    res.status(500).json([]);
+  }
 });
 
 app.get("/logout", (req, res) => {
@@ -851,67 +912,10 @@ app.post("/login-remotely", validateForgotPasswordEmail, handleValidationErrors,
   }
 });
 
-// A function to send booking confirmation e-mails to the customer as well as admin
+// A function to send booking confirmation e-mails to the customer as well as admin (Demo mode: suppressed real sending)
 async function sendConfirmationEmail(email, name, day, month, time, detail, address) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "mapleglowdetailing@gmail.com",
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const email1 = {
-      from: "mapleglowdetailing@gmail.com",
-      to: ["shethmohnish@gmail.com"],
-      subject: "New Customer Detail Booking",
-      text:
-        "Customer Name: " +
-        name +
-        "\n" +
-        "Customer E-mail: " +
-        email +
-        "\n" +
-        "Address: " +
-        address +
-        "\n" +
-        "Date: " +
-        month +
-        " " +
-        day +
-        "\n" +
-        "Time: " +
-        time +
-        "\n" +
-        "Detail Type: " +
-        detail,
-    };
-
-    const email2 = {
-      from: "mapleglowdetailing@gmail.com",
-      to: email,
-      subject: "Detail Booking Confirmation",
-      text:
-        "Hi " +
-        name +
-        ", \n \n" +
-        "Your " +
-        detail +
-        " detail is booked for " +
-        month +
-        " " +
-        day +
-        " at " +
-        time +
-        ".",
-    };
-
-    await transporter.sendMail(email1);
-    await transporter.sendMail(email2);
-  } catch (error) {
-    throw error;
-  }
+  console.log(`[DEMO MODE] Booking confirmation email suppressed for ${name} (${email}): ${detail} detail on ${month} ${day} at ${time}.`);
+  return true;
 }
 
 app.post("/send-confirmation-email", requireAuth, validateConfirmationEmail, handleValidationErrors, async (req, res) => {
@@ -936,28 +940,10 @@ app.post("/send-confirmation-email", requireAuth, validateConfirmationEmail, han
   }
 });
 
-// Function to send a customer's inquiry
+// Function to send a customer's inquiry (Demo mode: suppressed real sending)
 async function sendEmail(customerEmail, subject, text) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "mapleglowdetailing@gmail.com",
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const emailLayout = {
-      from: "mapleglowdetailing@gmail.com",
-      to: ["shethmohnish@gmail.com"],
-      subject: subject,
-      text: "Customer Inquiry from " + customerEmail + ": " + text,
-    };
-
-    await transporter.sendMail(emailLayout);
-  } catch (error) {
-    throw error;
-  }
+  console.log(`[DEMO MODE] Customer inquiry email suppressed from ${customerEmail}: Subject "${subject}"`);
+  return true;
 }
 
 app.post("/contact-form", validateContact, async (req, res) => {

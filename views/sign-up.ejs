@@ -1,122 +1,152 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
-  <%- include('layouts/navbar'); -%>
-    <title>Sign Up</title>
+    <%- include('layouts/navbar'); -%>
+    <title>Create Account | Maple Glow</title>
 </head>
 
 <body>
-  <div class="fade-in-container">
-    <h1 class="sign-up-title">Sign-Up</h1>
-    <style>
-      .sign-up-form {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-      }
-      #signupForm {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-      }
-      .form-group {
-        position: relative;
-        width: 100%;
-        opacity: 1;
-        transform: translateY(0);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        max-height: 100px;
-      }
-      .form-group.hidden-step {
-        opacity: 0;
-        transform: translateY(15px);
-        max-height: 0;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        pointer-events: none;
-      }
-      .form-group .alertText {
-        position: static;
-        display: block;
-        padding-top: 5px;
-        font-size: 0.8rem;
-      }
-      .input-container {
-        width: 100%;
-      }
-    </style>
-    
-    <div class="sign-up-form minimal-card">
-      <form id="signupForm" action="/sign-up-form" method="post" onsubmit="return fieldsCheck()">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-        
-        <div class="form-group" id="group-firstName">
-          <input type="text" id="firstName" name="firstName" class="input-box progressive-input" placeholder="First name" required />
+    <div class="fade-in-container" style="max-width: 520px; margin: 0 auto; padding: 3.5rem var(--page-gutter) 6rem;">
+
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2.25rem;">
+            <h1 style="margin: 0 0 0.5rem; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">
+                Create Your Account
+            </h1>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">
+                Join Maple Glow for fast online detailing bookings and instant AI cost estimates.
+            </p>
         </div>
 
-        <div class="form-group hidden-step" id="group-lastName">
-          <input type="text" id="lastName" name="lastName" class="input-box progressive-input" placeholder="Last name" required />
+        <!-- Sign-Up Card Container -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 2.25rem 2rem; box-shadow: 0 12px 36px rgba(0,0,0,0.04);">
+            
+            <form id="signupForm" action="/sign-up-form" method="post" onsubmit="return fieldsCheck()" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+                <!-- First & Last Name Row -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem;">
+                    <div class="form-group" id="group-firstName">
+                        <label for="firstName" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">First Name</label>
+                        <input type="text" id="firstName" name="firstName" class="apple-input progressive-input" placeholder="First Name" required />
+                    </div>
+
+                    <div class="form-group hidden-step" id="group-lastName">
+                        <label for="lastName" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" class="apple-input progressive-input" placeholder="Last Name" required />
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group hidden-step" id="group-email">
+                    <label for="email" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Email Address</label>
+                    <input type="email" id="email" name="email" class="apple-input progressive-input" placeholder="name@example.com" required />
+                    <span id="emailAlert" class="alertText" style="color: #d73a49; font-size: 0.82rem; font-weight: 600; margin-top: 4px; display: block;"></span>
+                </div>
+
+                <!-- Phone Number Field -->
+                <div class="form-group hidden-step" id="group-phoneNumber">
+                    <label for="phoneNumber" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Phone Number</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" class="apple-input progressive-input" placeholder="(555) 000-0000" required />
+                </div>
+
+                <!-- Address & Postal Code Row -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem;">
+                    <div class="form-group hidden-step" id="group-address">
+                        <label for="address" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Address</label>
+                        <input type="text" id="address" name="address" class="apple-input progressive-input" placeholder="Street Address" required />
+                    </div>
+
+                    <div class="form-group hidden-step" id="group-postalCode">
+                        <label for="postalCode" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Postal Code</label>
+                        <input type="text" id="postalCode" name="postalCode" class="apple-input progressive-input" placeholder="A1B 2C3" required />
+                    </div>
+                </div>
+
+                <!-- Username Field -->
+                <div class="form-group hidden-step" id="group-username">
+                    <label for="username" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Username</label>
+                    <input type="text" id="username" name="username" class="apple-input progressive-input" placeholder="Choose a Username" required />
+                    <span id="usernameAlert" class="alertText" style="color: #d73a49; font-size: 0.82rem; font-weight: 600; margin-top: 4px; display: block;"></span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group hidden-step" id="group-password">
+                    <label for="password" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="password" name="password" class="apple-input progressive-input" placeholder="At least 8 chars (1 upper, 1 lower, 1 special)" required style="padding-right: 48px;" />
+                        <button type="button" class="password-toggle" onclick="toggleApplePassword(this, 'password')" aria-label="Toggle password visibility">
+                            <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <span id="passwordAlert" class="alertText" style="color: #d73a49; font-size: 0.82rem; font-weight: 600; margin-top: 4px; display: block;"></span>
+                </div>
+
+                <!-- Confirm Password & Submit -->
+                <div class="form-group hidden-step" id="group-confirmPassword">
+                    <label for="confirmPassword" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: capitalize; letter-spacing: 0.5px;">Confirm Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="apple-input" placeholder="Confirm Password" required style="padding-right: 48px;" />
+                        <button type="button" class="password-toggle" onclick="toggleApplePassword(this, 'confirmPassword')" aria-label="Toggle password visibility">
+                            <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <span id="confirmPasswordAlert" class="alertText" style="color: #d73a49; font-size: 0.82rem; font-weight: 600; margin-top: 4px; display: block;"></span>
+                </div>
+
+                <button type="submit" id="submitBtn" class="apple-submit-btn" style="margin-top: 0.75rem;" disabled>
+                    <span>Create Account</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); font-size: 0.88rem; color: var(--text-secondary);">
+                Already have an account? <a href="/login" style="color: var(--primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span>Log in here</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+            </div>
+
         </div>
 
-        <div class="form-group hidden-step" id="group-email">
-          <input type="email" id="email" name="email" class="input-box progressive-input" placeholder="E-mail" required />
-          <span id="emailAlert" class="alertText"></span>
-        </div>
-
-        <div class="form-group hidden-step" id="group-phoneNumber">
-          <input type="tel" id="phoneNumber" name="phoneNumber" class="input-box progressive-input" placeholder="Phone number" required />
-        </div>
-
-        <div class="form-group hidden-step" id="group-address">
-          <input type="text" id="address" name="address" class="input-box progressive-input" placeholder="Address" required />
-        </div>
-
-        <div class="form-group hidden-step" id="group-postalCode">
-          <input type="text" id="postalCode" name="postalCode" class="input-box progressive-input" placeholder="Postal Code" required />
-        </div>
-
-        <div class="form-group hidden-step" id="group-username">
-          <input type="text" id="username" name="username" class="input-box progressive-input" placeholder="Username" required />
-          <span id="usernameAlert" class="alertText"></span>
-        </div>
-
-        <div class="form-group hidden-step" id="group-password">
-          <input type="password" id="password" name="password" class="input-box progressive-input" placeholder="Password" required />
-          <span id="passwordAlert" class="alertText"></span>
-        </div>
-
-        <div class="form-group hidden-step" id="group-confirmPassword">
-          <div class="input-container">
-            <input type="password" id="confirmPassword" name="confirmPassword" class="input-box" placeholder="Confirm password" required />
-            <button type="submit" class="submit-button" aria-label="Sign Up">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </button>
-          </div>
-          <span id="confirmPasswordAlert" class="alertText"></span>
-        </div>
-      </form>
     </div>
-
-    <br /><br />
-
-    <div class="form-hyperlink">
-      Already have an account?
-      <a class="hyperlink" href="/login">Log in here ↗</a>
-    </div>
-
-    <br /><br />
-  </div>
 </body>
 
+<style>
+  .form-group {
+    width: 100%;
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 120px;
+  }
+  .form-group.hidden-step {
+    opacity: 0;
+    transform: translateY(12px);
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+</style>
+
 <script>
-  //Error trapping functions to ensure user inputs valid information.
   function checkPass(pass) {
     if (pass.length < 8) {
       return false;
@@ -160,7 +190,7 @@
     if (!checkPass(password)) {
       passwordAlert.style.opacity = 1;
       passwordAlert.textContent =
-        "Must have 8 characters, one uppercase, one lowercase, and one special character";
+        "Must have at least 8 characters, 1 uppercase, 1 lowercase, and 1 special character";
       return false;
     }
 
@@ -174,21 +204,18 @@
       return true;
     }
     emailAlert.style.opacity = 1;
-    emailAlert.textContent = "Invalid e-mail address";
+    emailAlert.textContent = "Please enter a valid e-mail address";
     return false;
   }
 
   let usernameAlert = document.getElementById("usernameAlert");
   let usernameTaken = "<%= usernameTaken %>";
 
-  // Only show "Username taken" when the value is explicitly "true"
-  // (EJS renders boolean false as the string "false" which is truthy)
   if (usernameTaken === "true") {
     usernameAlert.style.opacity = 1;
     usernameAlert.textContent = "Username taken";
   }
 
-  // Clear the alert on back-forward navigation (bfcache)
   window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
       usernameAlert.textContent = "";
@@ -196,19 +223,38 @@
     }
   });
 
-  // Progressive reveal logic for form fields
+  function toggleApplePassword(btn, inputId) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+        btn.classList.add("show-password");
+    } else {
+        input.type = "password";
+        btn.classList.remove("show-password");
+    }
+  }
+
+  function checkFormCompletion() {
+    const inputs = Array.from(document.querySelectorAll('input[required]'));
+    const isComplete = inputs.every(input => input.value.trim() !== '');
+    const submitBtn = document.getElementById('submitBtn');
+    if (isComplete) {
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.disabled = true;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
-    const inputs = document.querySelectorAll('.progressive-input');
+    const progressiveInputs = document.querySelectorAll('.progressive-input');
+    const allInputs = document.querySelectorAll('input[required]');
     
-    // Function to reveal the next field(s)
     const revealNext = (input, index) => {
       if (input.value.trim() !== '') {
-        // Reveal the next field in the array
-        if (index < inputs.length - 1) {
-          const nextGroup = inputs[index + 1].closest('.form-group');
+        if (index < progressiveInputs.length - 1) {
+          const nextGroup = progressiveInputs[index + 1].closest('.form-group');
           if (nextGroup) nextGroup.classList.remove('hidden-step');
         }
-        // Specifically reveal confirm password when password is typed
         if (input.id === 'password') {
            const confirmGroup = document.getElementById('group-confirmPassword');
            if (confirmGroup) confirmGroup.classList.remove('hidden-step');
@@ -216,20 +262,25 @@
       }
     };
 
-    // 1. Initial check (handles browser autofill and bfcache)
     setTimeout(() => {
-      inputs.forEach((input, index) => revealNext(input, index));
+      progressiveInputs.forEach((input, index) => revealNext(input, index));
+      checkFormCompletion();
     }, 100);
 
-    // 2. Event listener for active typing
-    inputs.forEach((input, index) => {
+    progressiveInputs.forEach((input, index) => {
       input.addEventListener('input', () => revealNext(input, index));
-      // Also listen to change event for autofill edge cases
       input.addEventListener('change', () => revealNext(input, index));
+    });
+
+    allInputs.forEach(input => {
+      input.addEventListener('input', checkFormCompletion);
+      input.addEventListener('change', checkFormCompletion);
     });
   });
 </script>
 
-<footer><%- include('layouts/footer'); -%></footer>
+<footer>
+    <%- include('layouts/footer'); -%>
+</footer>
 
 </html>

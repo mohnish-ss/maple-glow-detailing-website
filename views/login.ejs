@@ -1,51 +1,170 @@
 <!DOCTYPE html>
+<html>
 
 <head>
     <%- include('layouts/navbar'); -%>
-        <title>Log In</title>
-        <script src="/js/login.js" defer></script>
+    <title>Sign In | Maple Glow</title>
 </head>
 
 <body>
-    <div class="fade-in-container login-container">
-        <h1 class="login-title">Log in to see your information.</h1>
-        <h2 class="login-subtitle">Log into your account</h2>
+    <div class="fade-in-container" style="max-width: 440px; margin: 0 auto; padding: 3.5rem var(--page-gutter) 6rem;">
 
-        <div class="login-form minimal-card" style="max-width: 500px; margin: 0 auto;">
-            <form method="POST" action="/check-login" style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <div class="input-container" style="width: 100%;">
-                    <label class="field-label" for="username">Username or email</label>
-                    <input class="input-box" type="text" id="username" name="username"
-                        placeholder="Username or email" required autocomplete="username" style="width: 100%; box-sizing: border-box;">
-                </div>
-
-                <div class="input-container" style="width: 100%;">
-                    <label class="field-label" for="password">Password</label>
-                    <input class="input-box" type="password" id="password" name="password" placeholder="Password"
-                        required autocomplete="current-password" style="width: 100%; box-sizing: border-box;">
-                    <button type="submit" class="submit-button">
-                        <img style="transform: scaleX(-1); width: 16px; height: 16px;" src="images/icon.webp" alt="Submit">
-                    </button>
-                </div>
-
-                <% if (loginInvalid) { %>
-                    <div class="error-message">
-                        <%= loginError %>
-                    </div>
-                <% } %>
-
-                <div class="form-hyperlink" style="text-align: center; margin-top: 0.5rem;">
-                    Don't have an account? <a class="hyperlink" href="/sign-up">Sign up here ↗</a>
-                </div>
-
-                <div class="form-hyperlink" style="text-align: center;">
-                    <a class="hyperlink" href="/forgot-password">Forgot your password? ↗</a>
-                </div>
-            </form>
+        <!-- Apple-style Centered Header -->
+        <div style="text-align: center; margin-bottom: 2.25rem;">
+            <h1 style="margin: 0 0 0.5rem; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">
+                Sign In
+            </h1>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">
+                Enter your details to manage your car detailing bookings.
+            </p>
         </div>
+
+        <!-- Apple-style Login Form Card -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 2.25rem 2rem; box-shadow: 0 12px 36px rgba(0,0,0,0.04);">
+            
+            <% if (loginInvalid) { %>
+                <div style="background-color: #ffebe9; color: #d73a49; border: 1px solid rgba(215, 58, 73, 0.2); padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span><%= loginError || "Invalid username or password." %></span>
+                </div>
+            <% } %>
+
+            <form method="POST" action="/check-login" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                <!-- Input Stack -->
+                <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                    <div>
+                        <label for="username" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem; text-transform: capitalize; letter-spacing: 0.5px;">Username or Email</label>
+                        <input class="apple-input" type="text" id="username" name="username" placeholder="Name or email" required autocomplete="username">
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <label for="password" style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); text-transform: capitalize; letter-spacing: 0.5px;">Password</label>
+                            <a href="/forgot-password" style="font-size: 0.82rem; color: var(--primary); text-decoration: none; font-weight: 600;">Forgot password?</a>
+                        </div>
+                        <div style="position: relative;">
+                            <input class="apple-input" type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password" style="padding-right: 48px;">
+                            <button type="button" class="password-toggle" onclick="toggleApplePassword(this, 'password')" aria-label="Toggle password visibility">
+                                <!-- Eye Closed (Eye-off) -->
+                                <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                                <!-- Eye Open -->
+                                <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div style="display: flex; align-items: center; gap: 8px; margin: 0.2rem 0 0.4rem;">
+                    <input type="checkbox" id="remember" name="remember" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;">
+                    <label for="remember" style="font-size: 0.88rem; color: var(--text-secondary); cursor: pointer; user-select: none;">Remember me</label>
+                </div>
+
+                <!-- Apple-style Primary Action Button -->
+                <button type="submit" id="loginSubmitBtn" class="apple-submit-btn">
+                    <span id="loginBtnText">Continue</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+
+            <div id="loginErrorBanner" style="display:none; background-color: #ffebe9; color: #d73a49; border: 1px solid rgba(215, 58, 73, 0.2); padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; margin-top: 1rem; display: none; align-items: center; gap: 10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span id="loginErrorText">Invalid username or password.</span>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); font-size: 0.88rem; color: var(--text-secondary);">
+                Don't have an account? <a href="/sign-up" class="hover-arrow-link" style="color: var(--primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span>Sign up now</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+            </div>
+
+        </div>
+
     </div>
 </body>
+
+<style>
+    .hover-arrow-link svg {
+        transition: transform var(--transition, 0.2s ease);
+    }
+    .hover-arrow-link:hover svg {
+        transform: translateX(4px);
+    }
+</style>
+
+<script>
+    // Intercept form submit — read JSON response and follow the redirect
+    document.querySelector('form[action="/check-login"]').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('loginSubmitBtn');
+        const btnText = document.getElementById('loginBtnText');
+        const errorBanner = document.getElementById('loginErrorBanner');
+
+        btn.disabled = true;
+        btnText.textContent = 'Signing in...';
+        errorBanner.style.display = 'none';
+
+        try {
+            const formData = new FormData(this);
+            const res = await fetch('/check-login', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            });
+            const responseText = await res.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                throw new Error(`Login request returned an invalid response (${res.status})`);
+            }
+
+            if (!res.ok) {
+                throw new Error(data.message || `Login request failed (${res.status})`);
+            }
+
+            if (data.success && data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                document.getElementById('loginErrorText').textContent = data.message || 'Invalid username or password.';
+                errorBanner.style.display = 'flex';
+                btn.disabled = false;
+                btnText.textContent = 'Continue';
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            document.getElementById('loginErrorText').textContent = err.message || 'An error occurred. Please try again.';
+            errorBanner.style.display = 'flex';
+            btn.disabled = false;
+            btnText.textContent = 'Continue';
+        }
+    });
+
+    function toggleApplePassword(btn, inputId) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            btn.classList.add("show-password");
+        } else {
+            input.type = "password";
+            btn.classList.remove("show-password");
+        }
+    }
+</script>
 
 <footer>
     <%- include('layouts/footer'); -%>

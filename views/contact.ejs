@@ -1,83 +1,112 @@
 <!DOCTYPE html>
+<html>
 
 <head>
-  <%- include('layouts/navbar'); -%>
-    <title>Contact Us</title>
+    <%- include('layouts/navbar'); -%>
+    <title>Contact Us | Maple Glow</title>
     <script src="/js/contact.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-  <div class="fade-in-container">
-    <h1 class="title">Contact Us</h1>
+    <div class="fade-in-container" style="max-width: 1120px; margin: 0 auto; padding: 2rem var(--page-gutter) 5rem;">
 
-    <div class="contact-container">
-      <div class="story-section">
-        <div class="story-grid-title">
-          <h2>Our Story</h2>
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h1 class="title" style="margin-bottom: 0.5rem;">Get in Touch</h1>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem;">
+                Have questions about our mobile car detailing packages? Send us a message or learn more about our story below.
+            </p>
         </div>
 
-        <div class="story-content">
-          <div class="founder-images">
-            <div class="founder">
-              <img src="/images/owen.png" alt="Owen" class="founder-portrait">
-              <p class="founder-name">Owen</p>
+        <div class="contact-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; align-items: stretch; padding: 0;">
+            
+            <!-- Left Column: Story & Founders Card -->
+            <div class="story-section" style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; box-sizing: border-box;">
+                <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem; color: var(--text-primary); border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                    Our Story
+                </h2>
+
+                <div class="founder-images" style="display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.75rem;">
+                    <div class="founder" style="text-align: center;">
+                        <img src="/images/owen.png" alt="Owen - Founder" class="founder-portrait" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-light); box-shadow: var(--shadow-sm); margin-bottom: 0.5rem;">
+                        <p class="founder-name" style="margin: 0; font-weight: 700; color: var(--text-primary);">Owen</p>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Co-Founder</span>
+                    </div>
+                    <div class="founder" style="text-align: center;">
+                        <img src="/images/wiam.png" alt="Liam - Founder" class="founder-portrait" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-light); box-shadow: var(--shadow-sm); margin-bottom: 0.5rem;">
+                        <p class="founder-name" style="margin: 0; font-weight: 700; color: var(--text-primary);">Liam</p>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Co-Founder</span>
+                    </div>
+                </div>
+
+                <div class="story-content" style="color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem;">
+                    <p style="margin-bottom: 1rem;">
+                        Owen and Liam, two university students, stumbled upon an idea during a gym session: a hassle-free, mobile car cleaning service that comes directly to you.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        What started as a basic wash expanded into comprehensive interior detailing, paint care, and mobile convenience across the region. Our story is built on resilience, attention to detail, and turning challenges into opportunities.
+                    </p>
+                </div>
+
+                <!-- Contact Quick Info Box -->
+                <div style="margin-top: auto; padding-top: 1.25rem; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; color: var(--text-secondary);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <span><strong>Phone:</strong> (888) 888-8888</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span><strong>Service Area:</strong> Mobile Detailing — We Come To You</span>
+                    </div>
+                </div>
             </div>
-            <div class="founder">
-              <img src="/images/wiam.png" alt="Liam" class="founder-portrait">
-              <p class="founder-name">Liam</p>
+
+            <!-- Right Column: Contact Form Card -->
+            <div class="form-section" style="background: var(--bg); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; box-sizing: border-box;">
+                <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem; color: var(--text-primary); border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+                    Send Us a Message
+                </h2>
+
+                <form class="contact-form" id="contact-form" action="/contact-form" method="post" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 1.25rem; border: none; padding: 0; box-shadow: none;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                    <div>
+                        <label class="profile-label" for="subject">Subject</label>
+                        <input class="input-box form-input-box" name="subject" id="subject" placeholder="e.g. Booking Inquiry" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <div>
+                        <label class="profile-label" for="email">E-mail Address</label>
+                        <input class="input-box form-input-box" type="email" name="email" id="email" placeholder="your.name@example.com" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <label class="profile-label" for="text">Message</label>
+                        <textarea name="message" id="text" class="input-box form-input" placeholder="How can we help you?" required style="width: 100%; flex: 1; min-height: 140px; resize: vertical; box-sizing: border-box; font-family: inherit;"></textarea>
+                    </div>
+
+                    <button class="contact-form-submit-button" type="submit" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 700; border-radius: var(--radius-pill); background-color: var(--primary); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all var(--transition);">
+                        <span>Send Message</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
             </div>
-          </div>
-          <p>Owen and Liam, two university students, stumbled upon an idea during a gym session: a car cleaning service.
-            Undeterred, we refined our technique.
-          </p>
-          <p>
-            From those early mishaps, our venture evolved. What started as a cleaning service expanded to include
-            interior detailing and mobile car cleaning. Our story is one of resilience, growth, and turning challenges
-            into opportunities. Welcome to the journey where innovation meets determination.
-          </p>
-          <p>
-            What began as a modest venture transcended into a full-fledged business. The duo's dedication expanded their
-            services, encompassing interior detailing and introducing the convenience of mobile car cleaning. The road
-            to success, marked by trial and error, became a testament to their resilience and unwavering spirit.
-          </p>
 
-          <p>
-            Encompassing interior detailing and introducing the convenience of mobile car cleaning. The road to success,
-            marked by trial and error, became a testament to their resilience and unwavering spirit.
-          </p>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-grid-title">
-          <h2>Have any questions? Submit this form</h2>
         </div>
 
-        <div class="form-wrapper">
-          <form class="contact-form" id="contact-form" action="/contact-form" method="post">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <label class="field-label" for="subject">Subject</label>
-            <input class="input-box form-input-box" name="subject" id="subject" placeholder="Subject" required>
-            <br><br>
-            <label class="field-label" for="email">Email</label>
-            <input class="input-box form-input-box" name="email" id="email" placeholder="E-mail" required>
-            <br><br>
-            <label class="field-label" for="text">Message</label>
-            <textarea name="message" id="text" class="input-box form-input" placeholder="Message" required></textarea>
-            <br><br>
-            <button class="contact-form-submit-button" type="submit">Submit</button>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
 
-
-
-  <footer>
-    <%- include('layouts/footer'); -%>
-  </footer>
+    <footer>
+        <%- include('layouts/footer'); -%>
+    </footer>
 </body>
 
 </html>
